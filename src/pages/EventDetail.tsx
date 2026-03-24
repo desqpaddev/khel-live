@@ -29,6 +29,10 @@ const EventDetail = () => {
   const [spotsLeft, setSpotsLeft] = useState(0);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [discountCode, setDiscountCode] = useState("");
+  const [appliedDiscount, setAppliedDiscount] = useState<{ name: string; value: number; unit: string } | null>(null);
+  const [discountError, setDiscountError] = useState("");
+  const [applyingCode, setApplyingCode] = useState(false);
 
   const [formData, setFormData] = useState({
     childName: "", parentName: "", email: "", phone: "", school: "", ageGroup: "", board: "",
