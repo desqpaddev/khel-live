@@ -43,7 +43,7 @@ const Index = () => {
       <HeroVideoSlider />
 
       {/* Stats - Floating cards over a gradient */}
-      <section className="relative -mt-20 z-30 pb-12">
+      <section className="relative -mt-8 z-30 pb-12 pt-4">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {stats.map((s, i) => (
