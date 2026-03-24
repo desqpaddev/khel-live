@@ -199,56 +199,119 @@ export type Database = {
       }
       registrations: {
         Row: {
-          age_group: string
+          address: string | null
+          age_group: string | null
+          airport_transfer: string | null
           bib_number: string | null
-          board: string
-          child_name: string
+          blood_group: string | null
+          board: string | null
+          breakfast_preference: string | null
+          child_name: string | null
+          city: string | null
+          club_organization: string | null
           created_at: string
+          date_of_birth: string | null
           email: string
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
           event_id: string
+          event_tshirt: string | null
+          first_name: string | null
+          first_time_participation: string | null
+          gender: string | null
+          hotel_accommodation: string | null
           id: string
-          parent_name: string
+          id_number: string | null
+          last_name: string | null
+          parent_name: string | null
           payment_status: string
           phone: string
+          photo_id_type: string | null
+          pincode: string | null
           registration_number: string | null
-          school: string
+          school: string | null
+          state_country: string | null
           status: string
+          swimming_expertise: string | null
+          terms_accepted: boolean | null
           updated_at: string
           user_id: string
         }
         Insert: {
-          age_group: string
+          address?: string | null
+          age_group?: string | null
+          airport_transfer?: string | null
           bib_number?: string | null
-          board: string
-          child_name: string
+          blood_group?: string | null
+          board?: string | null
+          breakfast_preference?: string | null
+          child_name?: string | null
+          city?: string | null
+          club_organization?: string | null
           created_at?: string
+          date_of_birth?: string | null
           email: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           event_id: string
+          event_tshirt?: string | null
+          first_name?: string | null
+          first_time_participation?: string | null
+          gender?: string | null
+          hotel_accommodation?: string | null
           id?: string
-          parent_name: string
+          id_number?: string | null
+          last_name?: string | null
+          parent_name?: string | null
           payment_status?: string
           phone: string
+          photo_id_type?: string | null
+          pincode?: string | null
           registration_number?: string | null
-          school: string
+          school?: string | null
+          state_country?: string | null
           status?: string
+          swimming_expertise?: string | null
+          terms_accepted?: boolean | null
           updated_at?: string
           user_id: string
         }
         Update: {
-          age_group?: string
+          address?: string | null
+          age_group?: string | null
+          airport_transfer?: string | null
           bib_number?: string | null
-          board?: string
-          child_name?: string
+          blood_group?: string | null
+          board?: string | null
+          breakfast_preference?: string | null
+          child_name?: string | null
+          city?: string | null
+          club_organization?: string | null
           created_at?: string
+          date_of_birth?: string | null
           email?: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           event_id?: string
+          event_tshirt?: string | null
+          first_name?: string | null
+          first_time_participation?: string | null
+          gender?: string | null
+          hotel_accommodation?: string | null
           id?: string
-          parent_name?: string
+          id_number?: string | null
+          last_name?: string | null
+          parent_name?: string | null
           payment_status?: string
           phone?: string
+          photo_id_type?: string | null
+          pincode?: string | null
           registration_number?: string | null
-          school?: string
+          school?: string | null
+          state_country?: string | null
           status?: string
+          swimming_expertise?: string | null
+          terms_accepted?: boolean | null
           updated_at?: string
           user_id?: string
         }
