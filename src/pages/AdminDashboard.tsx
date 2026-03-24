@@ -22,6 +22,7 @@ import AdminLeaderboard from "@/components/AdminLeaderboard";
 import AdminQRScanner from "@/components/AdminQRScanner";
 import AdminSettings from "@/components/AdminSettings";
 import AdminChat from "@/components/AdminChat";
+import AdminUserManagement from "@/components/AdminUserManagement";
 
 type Event = Tables<"events">;
 type Registration = Tables<"registrations"> & { events?: Event | null };
@@ -880,31 +881,7 @@ const AdminDashboard = () => {
 
           {/* USERS TAB */}
           <TabsContent value="users">
-            <h2 className="text-xl font-bold font-display text-foreground mb-4 uppercase">Registered Users ({allUsers.length})</h2>
-            <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-card">
-              <table className="w-full text-sm">
-                <thead className="bg-secondary">
-                  <tr>
-                    {["Name", "Phone", "School", "City", "Board", "Joined"].map(h => (
-                      <th key={h} className="text-left p-3 text-muted-foreground font-semibold text-xs uppercase tracking-wider">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {allUsers.map((u) => (
-                    <tr key={u.id} className="border-t border-border">
-                      <td className="p-3 text-foreground font-medium">{u.full_name || "—"}</td>
-                      <td className="p-3 text-foreground">{u.phone || "—"}</td>
-                      <td className="p-3 text-foreground">{u.school || "—"}</td>
-                      <td className="p-3 text-foreground">{u.city || "—"}</td>
-                      <td className="p-3 text-foreground">{u.board || "—"}</td>
-                      <td className="p-3 text-muted-foreground">{new Date(u.created_at).toLocaleDateString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {allUsers.length === 0 && <p className="text-center text-muted-foreground py-8">No users yet</p>}
-            </div>
+            <AdminUserManagement />
           </TabsContent>
 
           {/* ANALYTICS TAB */}
