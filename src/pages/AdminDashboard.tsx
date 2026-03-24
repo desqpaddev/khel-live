@@ -109,6 +109,10 @@ const AdminDashboard = () => {
   const [ticketForm, setTicketForm] = useState(emptyTicket);
   const [editingTicketId, setEditingTicketId] = useState<string | null>(null);
   const [ticketDialogOpen, setTicketDialogOpen] = useState(false);
+  const [discounts, setDiscounts] = useState<DiscountRow[]>([]);
+  const [discountForm, setDiscountForm] = useState(emptyDiscount);
+  const [editingDiscountId, setEditingDiscountId] = useState<string | null>(null);
+  const [discountDialogOpen, setDiscountDialogOpen] = useState(false);
   const [resultDialogOpen, setResultDialogOpen] = useState(false);
   const [resultForm, setResultForm] = useState({
     event_id: "", registration_id: "", position: "", time_recorded: "",
