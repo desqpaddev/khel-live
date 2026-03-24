@@ -74,6 +74,50 @@ const AdminQRScanner = () => {
     return () => { stopScanner(); };
   }, []);
 
+  const fetchCheckedInList = useCallback(async () => {
+    setLoadingList(true);
+    const { data } = await supabase
+      .from("registrations")
+      .select("registration_number, first_name, last_name, child_name, email, phone, bib_number, checked_in_at, events(title)")
+      .eq("checked_in", true)
+      .order("checked_in_at", { ascending: false });
+
+    if (data) {
+      setCheckedInList(data.map((r: any) => ({
+        registration_number: r.registration_number || "",
+        first_name: r.first_name || "",
+        last_name: r.last_name || "",
+        child_name: r.child_name || "",
+        event_title: r.events?.title || "",
+        checked_in_at: r.checked_in_at || "",
+        bib_number: r.bib_number,
+        email: r.email || "",
+        phone: r.phone || "",
+      })));
+    }
+    setLoadingList(false);
+  }, []);
+
+  useEffect(() => { fetchCheckedInList(); }, [fetchCheckedInList]);
+
+  const downloadExcel = () => {
+    if (!checkedInList.length) return;
+    const rows = checkedInList.map((r, i) => ({
+      "S.No": i + 1,
+      "Reg No": r.registration_number,
+      "Name": r.child_name || `${r.first_name} ${r.last_name}`.trim(),
+      "Event": r.event_title,
+      "BIB": r.bib_number || "-",
+      "Email": r.email,
+      "Phone": r.phone,
+      "Checked In At": r.checked_in_at ? new Date(r.checked_in_at).toLocaleString() : "",
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Checked In");
+    XLSX.writeFile(wb, `checked-in-entries-${new Date().toISOString().slice(0, 10)}.xlsx`);
+  };
+
   const handleScan = async (text: string, scanner: Html5Qrcode) => {
     try { await scanner.stop(); } catch {}
     setScanning(false);
