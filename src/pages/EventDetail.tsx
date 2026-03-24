@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, MapPin, Users, Clock, ArrowLeft, Shield, Award, Heart } from "lucide-react";
+import { Calendar, MapPin, Users, Clock, ArrowLeft, Shield, Award, Heart, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -13,12 +13,19 @@ import { useToast } from "@/hooks/use-toast";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Event = Tables<"events">;
+type TicketRow = {
+  id: string; event_id: string; ticket_type: string; description: string | null;
+  price: number; quantity: number; sale_start: string | null; sale_end: string | null;
+  attendee_message: string | null; status: string;
+};
 
 const EventDetail = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const { toast } = useToast();
   const [event, setEvent] = useState<Event | null>(null);
+  const [tickets, setTickets] = useState<TicketRow[]>([]);
+  const [selectedTicket, setSelectedTicket] = useState<TicketRow | null>(null);
   const [spotsLeft, setSpotsLeft] = useState(0);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -29,11 +36,18 @@ const EventDetail = () => {
 
   useEffect(() => {
     const fetchEvent = async () => {
-      const { data } = await supabase.from("events").select("*").eq("id", id!).single();
+      const [{ data }, { data: ticketData }] = await Promise.all([
+        supabase.from("events").select("*").eq("id", id!).single(),
+        supabase.from("tickets").select("*").eq("event_id", id!).eq("status", "active").order("price"),
+      ]);
       if (data) {
         setEvent(data);
         const { data: spots } = await supabase.rpc("get_event_spots_left", { event_id: data.id });
         setSpotsLeft(spots ?? data.total_spots);
+      }
+      if (ticketData && ticketData.length > 0) {
+        setTickets(ticketData as unknown as TicketRow[]);
+        setSelectedTicket(ticketData[0] as unknown as TicketRow);
       }
       setLoading(false);
     };
@@ -54,6 +68,7 @@ const EventDetail = () => {
   }
 
   const spotsPercent = ((event.total_spots - spotsLeft) / event.total_spots) * 100;
+  const displayPrice = selectedTicket ? selectedTicket.price : event.price;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,12 +93,22 @@ const EventDetail = () => {
     if (error) {
       toast({ title: "Registration failed", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Registration Submitted! 🎉", description: `${formData.childName} has been registered for ${event.title}.` });
+      const msg = selectedTicket?.attendee_message
+        ? `${formData.childName} has been registered for ${event.title}. ${selectedTicket.attendee_message}`
+        : `${formData.childName} has been registered for ${event.title}.`;
+      toast({ title: "Registration Submitted! 🎉", description: msg });
       setFormData({ childName: "", parentName: "", email: "", phone: "", school: "", ageGroup: "", board: "" });
       const { data: spots } = await supabase.rpc("get_event_spots_left", { event_id: event.id });
       setSpotsLeft(spots ?? spotsLeft - 1);
     }
     setSubmitting(false);
+  };
+
+  const now = new Date();
+  const isTicketOnSale = (t: TicketRow) => {
+    if (t.sale_start && new Date(t.sale_start) > now) return false;
+    if (t.sale_end && new Date(t.sale_end) < now) return false;
+    return true;
   };
 
   return (
@@ -124,6 +149,56 @@ const EventDetail = () => {
             <h2 className="text-xl font-bold font-display text-foreground mb-3 uppercase">About This Event</h2>
             <p className="text-muted-foreground leading-relaxed mb-8">{event.description}</p>
 
+            {/* Ticket Options */}
+            {tickets.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-xl font-bold font-display text-foreground mb-4 uppercase flex items-center gap-2">
+                  <Ticket size={20} className="text-primary" /> Available Tickets
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {tickets.map((t) => {
+                    const onSale = isTicketOnSale(t);
+                    const isSelected = selectedTicket?.id === t.id;
+                    return (
+                      <div
+                        key={t.id}
+                        onClick={() => onSale && setSelectedTicket(t)}
+                        className={`relative p-5 rounded-lg border-2 transition-all cursor-pointer ${
+                          isSelected
+                            ? "border-primary bg-primary/5 shadow-md"
+                            : onSale
+                            ? "border-border bg-card hover:border-primary/50"
+                            : "border-border bg-muted opacity-60 cursor-not-allowed"
+                        }`}
+                      >
+                        {isSelected && (
+                          <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                            <span className="text-primary-foreground text-xs">✓</span>
+                          </div>
+                        )}
+                        <div className="flex items-center justify-between mb-2">
+                          <Badge className="bg-primary/10 text-primary font-semibold">{t.ticket_type}</Badge>
+                          <span className="text-lg font-bold font-display text-foreground">₹{t.price}</span>
+                        </div>
+                        {t.description && <p className="text-sm text-muted-foreground mb-2">{t.description}</p>}
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span>{t.quantity} available</span>
+                          {!onSale && (
+                            <Badge variant="outline" className="text-xs">
+                              {t.sale_start && new Date(t.sale_start) > now ? "Not on sale yet" : "Sale ended"}
+                            </Badge>
+                          )}
+                          {onSale && t.sale_end && (
+                            <span>Ends {new Date(t.sale_end).toLocaleDateString()}</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <h2 className="text-xl font-bold font-display text-foreground mb-4 uppercase">What's Included</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
@@ -143,10 +218,15 @@ const EventDetail = () => {
           {/* Registration Form */}
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <div className="sticky top-24 rounded-lg border border-border bg-card p-6 shadow-card">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-2xl font-bold font-display text-foreground">₹{event.price}</span>
-                <Badge className="bg-primary/10 text-primary border-primary/20 font-semibold">per participant</Badge>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-2xl font-bold font-display text-foreground">₹{displayPrice}</span>
+                <Badge className="bg-primary/10 text-primary border-primary/20 font-semibold">
+                  {selectedTicket ? selectedTicket.ticket_type : "per participant"}
+                </Badge>
               </div>
+              {selectedTicket && (
+                <p className="text-xs text-muted-foreground mb-4">{selectedTicket.description}</p>
+              )}
 
               <div className="mb-6">
                 <div className="h-2 rounded-full bg-secondary overflow-hidden">
@@ -154,6 +234,21 @@ const EventDetail = () => {
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">{spotsLeft} spots remaining</p>
               </div>
+
+              {/* Ticket selector in sidebar for quick switch */}
+              {tickets.length > 1 && (
+                <div className="mb-4">
+                  <Label className="text-xs font-semibold uppercase tracking-wider">Ticket Type</Label>
+                  <Select value={selectedTicket?.id || ""} onValueChange={(v) => setSelectedTicket(tickets.find(t => t.id === v) || null)}>
+                    <SelectTrigger><SelectValue placeholder="Select ticket" /></SelectTrigger>
+                    <SelectContent>
+                      {tickets.filter(isTicketOnSale).map((t) => (
+                        <SelectItem key={t.id} value={t.id}>{t.ticket_type} — ₹{t.price}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               {!user ? (
                 <div className="text-center py-6">
@@ -190,7 +285,7 @@ const EventDetail = () => {
                     </div>
                   </div>
                   <Button type="submit" disabled={submitting} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow uppercase tracking-wider font-bold" size="lg">
-                    {submitting ? "Registering..." : `Register Now — ₹${event.price}`}
+                    {submitting ? "Registering..." : `Register Now — ₹${displayPrice}`}
                   </Button>
                   <p className="text-xs text-muted-foreground text-center">Includes RFID bib, medal, certificate & photo</p>
                 </form>
