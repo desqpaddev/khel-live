@@ -375,6 +375,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="results" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Results</TabsTrigger>
             <TabsTrigger value="users" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Users</TabsTrigger>
             <TabsTrigger value="analytics" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Analytics</TabsTrigger>
+            <TabsTrigger value="leaderboard" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Leaderboard</TabsTrigger>
           </TabsList>
 
           {/* EVENTS TAB */}
