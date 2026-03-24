@@ -15,6 +15,7 @@ import Dashboard from "./pages/Dashboard.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Results from "./pages/Results.tsx";
+import MyTicket from "./pages/MyTicket.tsx";
 
 const queryClient = new QueryClient();
 
