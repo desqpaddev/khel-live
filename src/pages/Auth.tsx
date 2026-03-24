@@ -27,6 +27,10 @@ const AuthPage = () => {
         toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
       } else {
         toast({ title: "Account created! 🎉", description: "Check your email to confirm your account." });
+        // Send welcome email via SMTP (fire & forget)
+        supabase.functions.invoke("send-welcome-email", {
+          body: { to: email, fullName },
+        }).catch(() => {});
       }
     } else {
       const { error } = await signIn(email, password);
