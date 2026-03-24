@@ -1022,6 +1022,11 @@ const AdminDashboard = () => {
             <AdminQRScanner />
           </TabsContent>
 
+          {/* CHAT TAB */}
+          <TabsContent value="chat">
+            <AdminChat />
+          </TabsContent>
+
           {/* SETTINGS TAB */}
           <TabsContent value="settings">
             <AdminSettings />
