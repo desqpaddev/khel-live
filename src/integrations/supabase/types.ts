@@ -14,16 +14,264 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      events: {
+        Row: {
+          age_groups: string[]
+          category: string
+          city: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          event_date: string
+          event_time: string
+          featured: boolean | null
+          id: string
+          price: number
+          sport: string
+          status: string
+          title: string
+          total_spots: number
+          updated_at: string
+          venue: string
+        }
+        Insert: {
+          age_groups?: string[]
+          category: string
+          city: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_date: string
+          event_time: string
+          featured?: boolean | null
+          id?: string
+          price?: number
+          sport: string
+          status?: string
+          title: string
+          total_spots?: number
+          updated_at?: string
+          venue: string
+        }
+        Update: {
+          age_groups?: string[]
+          category?: string
+          city?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_date?: string
+          event_time?: string
+          featured?: boolean | null
+          id?: string
+          price?: number
+          sport?: string
+          status?: string
+          title?: string
+          total_spots?: number
+          updated_at?: string
+          venue?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          age_group: string | null
+          avatar_url: string | null
+          board: string | null
+          city: string | null
+          created_at: string
+          full_name: string
+          id: string
+          phone: string | null
+          school: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age_group?: string | null
+          avatar_url?: string | null
+          board?: string | null
+          city?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          school?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age_group?: string | null
+          avatar_url?: string | null
+          board?: string | null
+          city?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          school?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      registrations: {
+        Row: {
+          age_group: string
+          bib_number: string | null
+          board: string
+          child_name: string
+          created_at: string
+          email: string
+          event_id: string
+          id: string
+          parent_name: string
+          payment_status: string
+          phone: string
+          school: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age_group: string
+          bib_number?: string | null
+          board: string
+          child_name: string
+          created_at?: string
+          email: string
+          event_id: string
+          id?: string
+          parent_name: string
+          payment_status?: string
+          phone: string
+          school: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age_group?: string
+          bib_number?: string | null
+          board?: string
+          child_name?: string
+          created_at?: string
+          email?: string
+          event_id?: string
+          id?: string
+          parent_name?: string
+          payment_status?: string
+          phone?: string
+          school?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      results: {
+        Row: {
+          certificate_url: string | null
+          created_at: string
+          distance_recorded: string | null
+          event_id: string
+          id: string
+          medal: string | null
+          notes: string | null
+          position: number | null
+          registration_id: string
+          score: number | null
+          time_recorded: string | null
+          updated_at: string
+        }
+        Insert: {
+          certificate_url?: string | null
+          created_at?: string
+          distance_recorded?: string | null
+          event_id: string
+          id?: string
+          medal?: string | null
+          notes?: string | null
+          position?: number | null
+          registration_id: string
+          score?: number | null
+          time_recorded?: string | null
+          updated_at?: string
+        }
+        Update: {
+          certificate_url?: string | null
+          created_at?: string
+          distance_recorded?: string | null
+          event_id?: string
+          id?: string
+          medal?: string | null
+          notes?: string | null
+          position?: number | null
+          registration_id?: string
+          score?: number | null
+          time_recorded?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "results_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "results_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_event_spots_left: { Args: { event_id: string }; Returns: number }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +398,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
