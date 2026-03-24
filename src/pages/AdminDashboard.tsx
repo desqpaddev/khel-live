@@ -52,6 +52,22 @@ const emptyTicket = {
   sale_start: "", sale_end: "", attendee_message: "", status: "active",
 };
 
+type DiscountRow = {
+  id: string; event_id: string | null; ticket_id: string | null; discount_type: string;
+  name: string; description: string | null; code: string | null;
+  discount_value: number; discount_unit: string; min_group_size: number | null;
+  min_past_events: number | null; affiliate_source: string | null;
+  max_uses: number | null; used_count: number; valid_from: string | null;
+  valid_until: string | null; is_active: boolean;
+  events?: Event | null; tickets?: TicketRow | null;
+};
+
+const emptyDiscount = {
+  event_id: "", ticket_id: "", discount_type: "code" as string, name: "", description: "",
+  code: "", discount_value: 0, discount_unit: "percent", min_group_size: "",
+  min_past_events: "", affiliate_source: "", max_uses: "", valid_from: "", valid_until: "",
+};
+
 const BibAssigner = ({ registration, onUpdate }: { registration: Registration; onUpdate: () => void }) => {
   const [bib, setBib] = useState(registration.bib_number || "");
   const [saving, setSaving] = useState(false);
