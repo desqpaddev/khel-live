@@ -35,9 +35,7 @@ const EventDetail = () => {
   const [discountError, setDiscountError] = useState("");
   const [applyingCode, setApplyingCode] = useState(false);
 
-  const [formData, setFormData] = useState({
-    childName: "", parentName: "", email: "", phone: "", school: "", ageGroup: "", board: "",
-  });
+
 
   useEffect(() => {
     const fetchEvent = async () => {
