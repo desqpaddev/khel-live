@@ -595,8 +595,8 @@ const AdminDashboard = () => {
                         <Select value={discountForm.ticket_id} onValueChange={(v) => setDiscountForm({ ...discountForm, ticket_id: v })}>
                           <SelectTrigger><SelectValue placeholder="All tickets" /></SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">All Tickets</SelectItem>
-                            {tickets.filter(t => !discountForm.event_id || t.event_id === discountForm.event_id).map((t) => <SelectItem key={t.id} value={t.id}>{t.ticket_type} — {t.events?.title}</SelectItem>)}
+                            <SelectItem value="all">All Tickets</SelectItem>
+                            {tickets.filter(t => !discountForm.event_id || discountForm.event_id === "all" || t.event_id === discountForm.event_id).map((t) => <SelectItem key={t.id} value={t.id}>{t.ticket_type} — {t.events?.title}</SelectItem>)}
                           </SelectContent>
                         </Select>
                       </div>
