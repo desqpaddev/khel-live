@@ -51,7 +51,7 @@ const Navbar = () => {
             <>
               {user ? (
                 <>
-                  {isAdmin && (
+                  {hasAnyRole && (
                     <Link to="/admin">
                       <Button variant="ghost" size="sm" className="text-primary gap-1 font-semibold">
                         <ShieldCheck size={16} /> Admin
