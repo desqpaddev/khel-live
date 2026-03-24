@@ -244,7 +244,7 @@ const AdminDashboard = () => {
     return map[t] || t;
   };
 
-
+  const saveEvent = async () => {
     const payload = { ...eventForm, created_by: user!.id, age_groups: eventForm.age_groups };
     if (editingEventId) {
       const { error } = await supabase.from("events").update(payload).eq("id", editingEventId);
