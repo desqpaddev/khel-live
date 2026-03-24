@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,52 +40,51 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pt-20 flex items-center justify-center">
+    <div className="min-h-screen bg-secondary pt-20 flex items-center justify-center">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md mx-4"
       >
-        <div className="rounded-xl border border-border bg-card p-8 shadow-card">
-          <h1 className="text-2xl font-bold text-foreground mb-1">
-            {isSignUp ? "Create Account" : "Welcome Back"}
-          </h1>
-          <p className="text-sm text-muted-foreground mb-6">
-            {isSignUp ? "Join KHELIUM and start your journey" : "Sign in to your KHELIUM account"}
-          </p>
+        <div className="rounded-lg border border-border bg-card p-8 shadow-card">
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold font-display text-foreground uppercase">
+              {isSignUp ? "Create Account" : "Welcome Back"}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {isSignUp ? "Join KHELIUM and start your journey" : "Sign in to your KHELIUM account"}
+            </p>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {isSignUp && (
               <div>
-                <Label className="text-foreground text-xs">Full Name</Label>
+                <Label className="text-xs font-semibold uppercase tracking-wider">Full Name</Label>
                 <Input
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="bg-muted border-border text-foreground"
                   placeholder="Your full name"
                 />
               </div>
             )}
             <div>
-              <Label className="text-foreground text-xs">Email</Label>
+              <Label className="text-xs font-semibold uppercase tracking-wider">Email</Label>
               <Input
                 required
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-muted border-border text-foreground"
                 placeholder="you@email.com"
               />
             </div>
             <div>
-              <Label className="text-foreground text-xs">Password</Label>
+              <Label className="text-xs font-semibold uppercase tracking-wider">Password</Label>
               <Input
                 required
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-muted border-border text-foreground"
                 placeholder="••••••••"
                 minLength={6}
               />
@@ -93,7 +92,7 @@ const AuthPage = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow uppercase tracking-wider font-bold"
               size="lg"
             >
               {loading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
@@ -104,7 +103,7 @@ const AuthPage = () => {
             {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
             <button
               onClick={() => setIsSignUp(!isSignUp)}
-              className="text-primary hover:underline font-medium"
+              className="text-primary hover:underline font-semibold"
             >
               {isSignUp ? "Sign In" : "Sign Up"}
             </button>

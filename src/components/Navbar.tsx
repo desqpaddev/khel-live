@@ -23,16 +23,22 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="Khelium" className="h-9 w-9" />
-          <span className="text-xl font-bold tracking-tight text-gradient">KHELIUM</span>
+          <span className="text-xl font-bold tracking-tight font-display text-foreground">KHELIUM</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((l) => (
-            <Link key={l.path} to={l.path} className={`text-sm font-medium transition-colors hover:text-primary ${location.pathname === l.path ? "text-primary" : "text-muted-foreground"}`}>
+            <Link
+              key={l.path}
+              to={l.path}
+              className={`text-sm font-semibold uppercase tracking-wider transition-colors hover:text-primary ${
+                location.pathname === l.path ? "text-primary" : "text-foreground"
+              }`}
+            >
               {l.label}
             </Link>
           ))}
@@ -45,21 +51,27 @@ const Navbar = () => {
                 <>
                   {isAdmin && (
                     <Link to="/admin">
-                      <Button variant="ghost" size="sm" className="text-primary gap-1"><ShieldCheck size={16} /> Admin</Button>
+                      <Button variant="ghost" size="sm" className="text-primary gap-1 font-semibold">
+                        <ShieldCheck size={16} /> Admin
+                      </Button>
                     </Link>
                   )}
                   <Link to="/dashboard">
-                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground gap-1"><LayoutDashboard size={16} /> Dashboard</Button>
+                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground gap-1">
+                      <LayoutDashboard size={16} /> Dashboard
+                    </Button>
                   </Link>
-                  <Button size="sm" variant="outline" onClick={handleSignOut} className="border-border text-foreground">Sign Out</Button>
+                  <Button size="sm" variant="outline" onClick={handleSignOut}>Sign Out</Button>
                 </>
               ) : (
                 <>
                   <Link to="/auth">
-                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Log In</Button>
+                    <Button variant="ghost" size="sm" className="text-foreground font-semibold">Log In</Button>
                   </Link>
                   <Link to="/auth">
-                    <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow">Register Now</Button>
+                    <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow font-semibold uppercase tracking-wider">
+                      Register Now
+                    </Button>
                   </Link>
                 </>
               )}
@@ -73,22 +85,29 @@ const Navbar = () => {
       </div>
 
       {open && (
-        <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-xl px-4 pb-4">
+        <div className="md:hidden border-t border-border bg-background px-4 pb-4">
           {navLinks.map((l) => (
-            <Link key={l.path} to={l.path} onClick={() => setOpen(false)} className={`block py-3 text-sm font-medium ${location.pathname === l.path ? "text-primary" : "text-muted-foreground"}`}>
+            <Link
+              key={l.path}
+              to={l.path}
+              onClick={() => setOpen(false)}
+              className={`block py-3 text-sm font-semibold uppercase tracking-wider ${
+                location.pathname === l.path ? "text-primary" : "text-foreground"
+              }`}
+            >
               {l.label}
             </Link>
           ))}
           {user ? (
             <>
-              <Link to="/dashboard" onClick={() => setOpen(false)} className="block py-3 text-sm font-medium text-muted-foreground">Dashboard</Link>
-              {isAdmin && <Link to="/admin" onClick={() => setOpen(false)} className="block py-3 text-sm font-medium text-primary">Admin</Link>}
+              <Link to="/dashboard" onClick={() => setOpen(false)} className="block py-3 text-sm font-semibold text-foreground">Dashboard</Link>
+              {isAdmin && <Link to="/admin" onClick={() => setOpen(false)} className="block py-3 text-sm font-semibold text-primary">Admin</Link>}
               <Button variant="ghost" size="sm" onClick={() => { handleSignOut(); setOpen(false); }} className="text-muted-foreground mt-2">Sign Out</Button>
             </>
           ) : (
             <div className="flex gap-3 pt-3">
               <Link to="/auth" onClick={() => setOpen(false)}>
-                <Button variant="ghost" size="sm" className="text-muted-foreground">Log In</Button>
+                <Button variant="ghost" size="sm">Log In</Button>
               </Link>
               <Link to="/auth" onClick={() => setOpen(false)}>
                 <Button size="sm" className="bg-primary text-primary-foreground">Register Now</Button>
