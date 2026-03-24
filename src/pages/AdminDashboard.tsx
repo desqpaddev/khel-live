@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { Tables } from "@/integrations/supabase/types";
 import { downloadCertificate } from "@/lib/certificate";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import AdminLeaderboard from "@/components/AdminLeaderboard";
 
 type Event = Tables<"events">;
 type Registration = Tables<"registrations"> & { events?: Event | null };
