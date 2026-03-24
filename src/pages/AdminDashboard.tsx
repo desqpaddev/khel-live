@@ -85,10 +85,14 @@ const AdminDashboard = () => {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [results, setResults] = useState<Result[]>([]);
   const [allUsers, setAllUsers] = useState<Tables<"profiles">[]>([]);
+  const [tickets, setTickets] = useState<TicketRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [eventForm, setEventForm] = useState(emptyEvent);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
+  const [ticketForm, setTicketForm] = useState(emptyTicket);
+  const [editingTicketId, setEditingTicketId] = useState<string | null>(null);
+  const [ticketDialogOpen, setTicketDialogOpen] = useState(false);
   const [resultDialogOpen, setResultDialogOpen] = useState(false);
   const [resultForm, setResultForm] = useState({
     event_id: "", registration_id: "", position: "", time_recorded: "",
