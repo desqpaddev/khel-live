@@ -301,7 +301,9 @@ const AdminDashboard = () => {
       venue: ev.venue, event_date: ev.event_date, event_time: ev.event_time,
       age_groups: ev.age_groups, price: ev.price, total_spots: ev.total_spots,
       description: ev.description || "", featured: ev.featured || false, status: ev.status,
+      image_url: (ev as any).image_url || "",
     });
+    setImageFile(null);
     setEventDialogOpen(true);
   };
 
