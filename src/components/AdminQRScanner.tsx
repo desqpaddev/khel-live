@@ -20,6 +20,18 @@ interface ScannedAttendee {
   bib_number: string | null;
 }
 
+interface CheckedInRecord {
+  registration_number: string;
+  first_name: string;
+  last_name: string;
+  child_name: string;
+  event_title: string;
+  checked_in_at: string;
+  bib_number: string | null;
+  email: string;
+  phone: string;
+}
+
 const AdminQRScanner = () => {
   const { toast } = useToast();
   const [scanning, setScanning] = useState(false);
@@ -27,6 +39,8 @@ const AdminQRScanner = () => {
   const [scannedAttendee, setScannedAttendee] = useState<ScannedAttendee | null>(null);
   const [error, setError] = useState("");
   const [processing, setProcessing] = useState(false);
+  const [checkedInList, setCheckedInList] = useState<CheckedInRecord[]>([]);
+  const [loadingList, setLoadingList] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const containerId = "qr-reader";
 
