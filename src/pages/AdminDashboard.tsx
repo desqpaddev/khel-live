@@ -897,6 +897,11 @@ const AdminDashboard = () => {
             <AdminUserManagement />
           </TabsContent>
 
+          {/* FINANCE TAB */}
+          <TabsContent value="finance">
+            <AdminFinance events={events} registrations={registrations} />
+          </TabsContent>
+
           {/* ANALYTICS TAB */}
           <TabsContent value="analytics">
             <h2 className="text-xl font-bold font-display text-foreground mb-6 uppercase">Analytics & Insights</h2>
