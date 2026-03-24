@@ -326,8 +326,43 @@ const EventDetail = () => {
                       </Select>
                     </div>
                   </div>
+
+                  {/* Discount Code */}
+                  <div className="border border-dashed border-border rounded-lg p-3 space-y-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1"><Tag size={12} /> Discount Code</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={discountCode}
+                        onChange={(e) => { setDiscountCode(e.target.value.toUpperCase()); setDiscountError(""); }}
+                        placeholder="Enter code"
+                        className="font-mono text-sm flex-1"
+                        disabled={!!appliedDiscount}
+                      />
+                      {appliedDiscount ? (
+                        <Button type="button" variant="outline" size="sm" onClick={() => { setAppliedDiscount(null); setDiscountCode(""); }} className="text-xs shrink-0">Remove</Button>
+                      ) : (
+                        <Button type="button" variant="outline" size="sm" onClick={applyDiscountCode} disabled={applyingCode || !discountCode.trim()} className="text-xs shrink-0">{applyingCode ? "..." : "Apply"}</Button>
+                      )}
+                    </div>
+                    {discountError && <p className="text-xs text-destructive">{discountError}</p>}
+                    {appliedDiscount && (
+                      <div className="flex items-center gap-1 text-xs text-green-600">
+                        <Check size={12} /> {appliedDiscount.name} — {appliedDiscount.unit === "percent" ? `${appliedDiscount.value}% off` : `₹${appliedDiscount.value} off`}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Price Summary */}
+                  {discountAmount > 0 && (
+                    <div className="bg-secondary rounded-lg p-3 space-y-1 text-sm">
+                      <div className="flex justify-between text-muted-foreground"><span>Ticket Price</span><span>₹{displayPrice}</span></div>
+                      <div className="flex justify-between text-green-600"><span>Discount</span><span>-₹{discountAmount}</span></div>
+                      <div className="flex justify-between font-bold text-foreground border-t border-border pt-1"><span>Total</span><span>₹{finalPrice}</span></div>
+                    </div>
+                  )}
+
                   <Button type="submit" disabled={submitting} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow uppercase tracking-wider font-bold" size="lg">
-                    {submitting ? "Registering..." : `Register Now — ₹${displayPrice}`}
+                    {submitting ? "Registering..." : `Register Now — ₹${finalPrice}`}
                   </Button>
                   <p className="text-xs text-muted-foreground text-center">Includes RFID bib, medal, certificate & photo</p>
                 </form>
