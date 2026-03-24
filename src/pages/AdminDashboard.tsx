@@ -124,18 +124,20 @@ const AdminDashboard = () => {
 
   const fetchAll = async () => {
     setLoading(true);
-    const [evRes, regRes, resRes, usersRes, ticketRes] = await Promise.all([
+    const [evRes, regRes, resRes, usersRes, ticketRes, discountRes] = await Promise.all([
       supabase.from("events").select("*").order("event_date", { ascending: false }),
       supabase.from("registrations").select("*, events(*)").order("created_at", { ascending: false }),
       supabase.from("results").select("*, events(*), registrations(*)").order("created_at", { ascending: false }),
       supabase.from("profiles").select("*").order("created_at", { ascending: false }),
       supabase.from("tickets").select("*, events(*)").order("created_at", { ascending: false }),
+      supabase.from("discounts").select("*, events(*), tickets(*)").order("created_at", { ascending: false }),
     ]);
     if (evRes.data) setEvents(evRes.data);
     if (regRes.data) setRegistrations(regRes.data as Registration[]);
     if (resRes.data) setResults(resRes.data as Result[]);
     if (usersRes.data) setAllUsers(usersRes.data);
     if (ticketRes.data) setTickets(ticketRes.data as unknown as TicketRow[]);
+    if (discountRes.data) setDiscounts(discountRes.data as unknown as DiscountRow[]);
     setLoading(false);
   };
 
