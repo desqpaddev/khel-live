@@ -89,14 +89,15 @@ serve(async (req) => {
       throw new Error("SMTP port is invalid");
     }
 
-    const attempts: SmtpAttempt[] = [{
-      port: configuredPort,
-      tls: configuredPort === 465,
-    }];
+    const isGmailHost = /(^|\.)gmail\.com$/i.test(cfg.smtp_host) || /(^|\.)googlemail\.com$/i.test(cfg.smtp_host);
 
-    // Gmail/STARTTLS in denomailer can fail on port 587 with InvalidContentType.
-    // Retry once with implicit TLS on 465 to keep admin setup simple.
-    if (configuredPort === 587) {
+    // Denomailer + STARTTLS on 587 is unstable in edge runtime for some providers (including Gmail).
+    // For Gmail we force implicit TLS on 465 even if admin entered 587.
+    const attempts: SmtpAttempt[] = isGmailHost
+      ? [{ port: 465, tls: true }]
+      : [{ port: configuredPort, tls: configuredPort === 465 }];
+
+    if (!isGmailHost && configuredPort === 587) {
       attempts.push({ port: 465, tls: true });
     }
 
@@ -111,7 +112,12 @@ serve(async (req) => {
       } catch (error) {
         lastError = error;
         const message = error instanceof Error ? error.message : String(error);
-        const shouldRetry = configuredPort === 587 && attempt.port === 587 && message.includes("InvalidContentType");
+        const isStartTlsFailure =
+          message.includes("InvalidContentType") ||
+          message.includes("Bad resource ID") ||
+          message.toLowerCase().includes("starttls") ||
+          message.toLowerCase().includes("invalid cmd");
+        const shouldRetry = !isGmailHost && configuredPort === 587 && attempt.port === 587 && isStartTlsFailure;
 
         if (!shouldRetry) {
           throw error;
