@@ -123,6 +123,8 @@ const AdminDashboard = () => {
     distance_recorded: "", score: "", medal: "", notes: "",
   });
   const [searchReg, setSearchReg] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => { fetchAll(); }, []);
 
