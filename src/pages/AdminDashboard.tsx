@@ -551,6 +551,135 @@ const AdminDashboard = () => {
             </div>
           </TabsContent>
 
+          {/* DISCOUNTS TAB */}
+          <TabsContent value="discounts">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold font-display text-foreground uppercase">Manage Discounts ({discounts.length})</h2>
+              <Dialog open={discountDialogOpen} onOpenChange={(o) => { setDiscountDialogOpen(o); if (!o) { setEditingDiscountId(null); setDiscountForm(emptyDiscount); } }}>
+                <DialogTrigger asChild>
+                  <Button className="bg-primary text-primary-foreground gap-2 uppercase font-semibold tracking-wider"><Plus size={16} /> Create Discount</Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="font-display uppercase">{editingDiscountId ? "Edit Discount" : "Create Discount"}</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-xs font-semibold uppercase tracking-wider">Discount Type</Label>
+                      <Select value={discountForm.discount_type} onValueChange={(v) => setDiscountForm({ ...discountForm, discount_type: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="code">🏷️ Code Discount</SelectItem>
+                          <SelectItem value="group">👥 Group Discount</SelectItem>
+                          <SelectItem value="flat">💰 Flat Discount</SelectItem>
+                          <SelectItem value="loyalty">⭐ Loyalty Discount</SelectItem>
+                          <SelectItem value="affiliate">🔗 Affiliate Discount</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div><Label className="text-xs font-semibold uppercase tracking-wider">Name</Label><Input value={discountForm.name} onChange={(e) => setDiscountForm({ ...discountForm, name: e.target.value })} placeholder="e.g. Summer Sale 20%" /></div>
+                    <div><Label className="text-xs font-semibold uppercase tracking-wider">Description</Label><Textarea value={discountForm.description} onChange={(e) => setDiscountForm({ ...discountForm, description: e.target.value })} rows={2} /></div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-xs font-semibold uppercase tracking-wider">Event (optional)</Label>
+                        <Select value={discountForm.event_id} onValueChange={(v) => setDiscountForm({ ...discountForm, event_id: v })}>
+                          <SelectTrigger><SelectValue placeholder="All events" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">All Events</SelectItem>
+                            {events.map((e) => <SelectItem key={e.id} value={e.id}>{e.title}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-semibold uppercase tracking-wider">Ticket (optional)</Label>
+                        <Select value={discountForm.ticket_id} onValueChange={(v) => setDiscountForm({ ...discountForm, ticket_id: v })}>
+                          <SelectTrigger><SelectValue placeholder="All tickets" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">All Tickets</SelectItem>
+                            {tickets.filter(t => !discountForm.event_id || t.event_id === discountForm.event_id).map((t) => <SelectItem key={t.id} value={t.id}>{t.ticket_type} — {t.events?.title}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><Label className="text-xs font-semibold uppercase tracking-wider">Discount Value</Label><Input type="number" value={discountForm.discount_value} onChange={(e) => setDiscountForm({ ...discountForm, discount_value: parseFloat(e.target.value) || 0 })} /></div>
+                      <div>
+                        <Label className="text-xs font-semibold uppercase tracking-wider">Unit</Label>
+                        <Select value={discountForm.discount_unit} onValueChange={(v) => setDiscountForm({ ...discountForm, discount_unit: v })}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="percent">Percent (%)</SelectItem>
+                            <SelectItem value="flat">Flat (₹)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {discountForm.discount_type === "code" && (
+                      <div><Label className="text-xs font-semibold uppercase tracking-wider">Discount Code</Label><Input value={discountForm.code} onChange={(e) => setDiscountForm({ ...discountForm, code: e.target.value.toUpperCase() })} placeholder="SUMMER2026" className="font-mono" /></div>
+                    )}
+                    {discountForm.discount_type === "group" && (
+                      <div><Label className="text-xs font-semibold uppercase tracking-wider">Min Group Size</Label><Input type="number" value={discountForm.min_group_size} onChange={(e) => setDiscountForm({ ...discountForm, min_group_size: e.target.value })} placeholder="e.g. 5" /></div>
+                    )}
+                    {discountForm.discount_type === "loyalty" && (
+                      <div><Label className="text-xs font-semibold uppercase tracking-wider">Min Past Events Attended</Label><Input type="number" value={discountForm.min_past_events} onChange={(e) => setDiscountForm({ ...discountForm, min_past_events: e.target.value })} placeholder="e.g. 3" /></div>
+                    )}
+                    {discountForm.discount_type === "affiliate" && (
+                      <div><Label className="text-xs font-semibold uppercase tracking-wider">Affiliate Source / Partner</Label><Input value={discountForm.affiliate_source} onChange={(e) => setDiscountForm({ ...discountForm, affiliate_source: e.target.value })} placeholder="e.g. SchoolPartner123" /></div>
+                    )}
+
+                    <div><Label className="text-xs font-semibold uppercase tracking-wider">Max Uses (leave empty for unlimited)</Label><Input type="number" value={discountForm.max_uses} onChange={(e) => setDiscountForm({ ...discountForm, max_uses: e.target.value })} placeholder="Unlimited" /></div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><Label className="text-xs font-semibold uppercase tracking-wider">Valid From</Label><Input type="datetime-local" value={discountForm.valid_from} onChange={(e) => setDiscountForm({ ...discountForm, valid_from: e.target.value })} /></div>
+                      <div><Label className="text-xs font-semibold uppercase tracking-wider">Valid Until</Label><Input type="datetime-local" value={discountForm.valid_until} onChange={(e) => setDiscountForm({ ...discountForm, valid_until: e.target.value })} /></div>
+                    </div>
+                    <Button onClick={saveDiscount} className="w-full bg-primary text-primary-foreground uppercase font-bold tracking-wider">{editingDiscountId ? "Update Discount" : "Create Discount"}</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-card">
+              <table className="w-full text-sm">
+                <thead className="bg-secondary">
+                  <tr>
+                    {["Name", "Type", "Value", "Code/Condition", "Event", "Uses", "Validity", "Actions"].map(h => (
+                      <th key={h} className="text-left p-3 text-muted-foreground font-semibold text-xs uppercase tracking-wider">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {discounts.map((d) => (
+                    <tr key={d.id} className="border-t border-border">
+                      <td className="p-3 text-foreground font-medium">{d.name}</td>
+                      <td className="p-3"><Badge className="bg-primary/10 text-primary text-xs">{discountTypeLabel(d.discount_type)}</Badge></td>
+                      <td className="p-3 text-foreground font-semibold">{d.discount_unit === "percent" ? `${d.discount_value}%` : `₹${d.discount_value}`}</td>
+                      <td className="p-3 text-foreground text-xs font-mono">
+                        {d.discount_type === "code" && d.code && <Badge variant="outline">{d.code}</Badge>}
+                        {d.discount_type === "group" && d.min_group_size && <span>Min {d.min_group_size} participants</span>}
+                        {d.discount_type === "loyalty" && d.min_past_events && <span>Min {d.min_past_events} past events</span>}
+                        {d.discount_type === "affiliate" && d.affiliate_source && <span>{d.affiliate_source}</span>}
+                        {d.discount_type === "flat" && <span>Auto-applied</span>}
+                      </td>
+                      <td className="p-3 text-muted-foreground text-xs">{d.events?.title || "All events"}</td>
+                      <td className="p-3 text-foreground">{d.used_count}{d.max_uses ? `/${d.max_uses}` : "/∞"}</td>
+                      <td className="p-3 text-muted-foreground text-xs">
+                        {d.valid_from ? new Date(d.valid_from).toLocaleDateString() : "—"} → {d.valid_until ? new Date(d.valid_until).toLocaleDateString() : "—"}
+                      </td>
+                      <td className="p-3">
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="ghost" onClick={() => openEditDiscount(d)} className="text-muted-foreground hover:text-foreground"><Edit size={16} /></Button>
+                          <Button size="sm" variant="ghost" onClick={() => deleteDiscount(d.id)} className="text-destructive hover:text-destructive"><Trash2 size={16} /></Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {discounts.length === 0 && <p className="text-center text-muted-foreground py-8">No discounts created yet</p>}
+            </div>
+          </TabsContent>
+
           {/* REGISTRATIONS TAB */}
           <TabsContent value="registrations">
             <div className="flex items-center justify-between mb-4">
