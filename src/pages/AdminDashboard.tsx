@@ -1020,6 +1020,8 @@ const AdminDashboard = () => {
             <AdminSettings />
           </TabsContent>
         </Tabs>
+          );
+        })()}
       </div>
     </div>
   );
