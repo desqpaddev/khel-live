@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Calendar, MapPin, Trophy, User, Settings, LogOut, Award, BarChart3 } from "lucide-react";
+import { Calendar, MapPin, Trophy, User, Settings, LogOut, Award, BarChart3, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
