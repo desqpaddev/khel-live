@@ -189,8 +189,8 @@ const AdminDashboard = () => {
 
   const saveDiscount = async () => {
     const payload = {
-      event_id: discountForm.event_id || null,
-      ticket_id: discountForm.ticket_id || null,
+      event_id: discountForm.event_id && discountForm.event_id !== "all" ? discountForm.event_id : null,
+      ticket_id: discountForm.ticket_id && discountForm.ticket_id !== "all" ? discountForm.ticket_id : null,
       discount_type: discountForm.discount_type,
       name: discountForm.name,
       description: discountForm.description || null,
@@ -585,7 +585,7 @@ const AdminDashboard = () => {
                         <Select value={discountForm.event_id} onValueChange={(v) => setDiscountForm({ ...discountForm, event_id: v })}>
                           <SelectTrigger><SelectValue placeholder="All events" /></SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">All Events</SelectItem>
+                            <SelectItem value="all">All Events</SelectItem>
                             {events.map((e) => <SelectItem key={e.id} value={e.id}>{e.title}</SelectItem>)}
                           </SelectContent>
                         </Select>
@@ -595,8 +595,8 @@ const AdminDashboard = () => {
                         <Select value={discountForm.ticket_id} onValueChange={(v) => setDiscountForm({ ...discountForm, ticket_id: v })}>
                           <SelectTrigger><SelectValue placeholder="All tickets" /></SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">All Tickets</SelectItem>
-                            {tickets.filter(t => !discountForm.event_id || t.event_id === discountForm.event_id).map((t) => <SelectItem key={t.id} value={t.id}>{t.ticket_type} — {t.events?.title}</SelectItem>)}
+                            <SelectItem value="all">All Tickets</SelectItem>
+                            {tickets.filter(t => !discountForm.event_id || discountForm.event_id === "all" || t.event_id === discountForm.event_id).map((t) => <SelectItem key={t.id} value={t.id}>{t.ticket_type} — {t.events?.title}</SelectItem>)}
                           </SelectContent>
                         </Select>
                       </div>
