@@ -268,37 +268,9 @@ const EventDetail = () => {
                   <Link to="/auth"><Button className="bg-primary text-primary-foreground w-full uppercase tracking-wider font-bold">Sign In / Sign Up</Button></Link>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div><Label className="text-xs font-semibold uppercase tracking-wider">Child's Name</Label><Input required value={formData.childName} onChange={(e) => setFormData({ ...formData, childName: e.target.value })} placeholder="Full name" /></div>
-                  <div><Label className="text-xs font-semibold uppercase tracking-wider">Parent's Name</Label><Input required value={formData.parentName} onChange={(e) => setFormData({ ...formData, parentName: e.target.value })} placeholder="Full name" /></div>
-                  <div><Label className="text-xs font-semibold uppercase tracking-wider">Email</Label><Input required type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="parent@email.com" /></div>
-                  <div><Label className="text-xs font-semibold uppercase tracking-wider">Phone</Label><Input required value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="+91 ..." /></div>
-                  <div><Label className="text-xs font-semibold uppercase tracking-wider">School</Label><Input required value={formData.school} onChange={(e) => setFormData({ ...formData, school: e.target.value })} placeholder="School name" /></div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label className="text-xs font-semibold uppercase tracking-wider">Age Group</Label>
-                      <Select value={formData.ageGroup} onValueChange={(v) => setFormData({ ...formData, ageGroup: v })}>
-                        <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                        <SelectContent>
-                          {event.age_groups.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label className="text-xs font-semibold uppercase tracking-wider">Board</Label>
-                      <Select value={formData.board} onValueChange={(v) => setFormData({ ...formData, board: v })}>
-                        <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="CBSE">CBSE</SelectItem>
-                          <SelectItem value="ICSE">ICSE</SelectItem>
-                          <SelectItem value="State">State Board</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
+                <>
                   {/* Discount Code */}
-                  <div className="border border-dashed border-border rounded-lg p-3 space-y-2">
+                  <div className="border border-dashed border-border rounded-lg p-3 space-y-2 mb-4">
                     <Label className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1"><Tag size={12} /> Discount Code</Label>
                     <div className="flex gap-2">
                       <Input
@@ -324,18 +296,21 @@ const EventDetail = () => {
 
                   {/* Price Summary */}
                   {discountAmount > 0 && (
-                    <div className="bg-secondary rounded-lg p-3 space-y-1 text-sm">
+                    <div className="bg-secondary rounded-lg p-3 space-y-1 text-sm mb-4">
                       <div className="flex justify-between text-muted-foreground"><span>Ticket Price</span><span>₹{displayPrice}</span></div>
                       <div className="flex justify-between text-green-600"><span>Discount</span><span>-₹{discountAmount}</span></div>
                       <div className="flex justify-between font-bold text-foreground border-t border-border pt-1"><span>Total</span><span>₹{finalPrice}</span></div>
                     </div>
                   )}
 
-                  <Button type="submit" disabled={submitting} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow uppercase tracking-wider font-bold" size="lg">
-                    {submitting ? "Registering..." : `Register Now — ₹${finalPrice}`}
-                  </Button>
-                  <p className="text-xs text-muted-foreground text-center">Includes RFID bib, medal, certificate & photo</p>
-                </form>
+                  <RegistrationForm
+                    eventId={event.id}
+                    userId={user.id}
+                    ticketLabel={selectedTicket?.ticket_type}
+                    finalPrice={finalPrice}
+                    onSuccess={handleRegistrationSuccess}
+                  />
+                </>
               )}
             </div>
           </motion.div>
