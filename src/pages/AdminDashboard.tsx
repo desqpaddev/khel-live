@@ -450,6 +450,19 @@ const AdminDashboard = () => {
                       </div>
                     </div>
                     <div><Label className="text-xs font-semibold uppercase tracking-wider">Description</Label><Textarea value={eventForm.description} onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })} rows={3} /></div>
+                    <div>
+                      <Label className="text-xs font-semibold uppercase tracking-wider">Event Image</Label>
+                      <Input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} className="mt-1" />
+                      {(imageFile || eventForm.image_url) && (
+                        <div className="mt-2 relative rounded-lg overflow-hidden border border-border h-32">
+                          <img
+                            src={imageFile ? URL.createObjectURL(imageFile) : eventForm.image_url}
+                            alt="Preview"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                    </div>
                     <div className="flex items-center gap-3">
                       <Label className="text-xs font-semibold uppercase tracking-wider">Featured</Label>
                       <Switch checked={eventForm.featured as boolean} onCheckedChange={(v) => setEventForm({ ...eventForm, featured: v })} />
