@@ -210,6 +210,7 @@ export type Database = {
           parent_name: string
           payment_status: string
           phone: string
+          registration_number: string | null
           school: string
           status: string
           updated_at: string
@@ -227,6 +228,7 @@ export type Database = {
           parent_name: string
           payment_status?: string
           phone: string
+          registration_number?: string | null
           school: string
           status?: string
           updated_at?: string
@@ -244,6 +246,7 @@ export type Database = {
           parent_name?: string
           payment_status?: string
           phone?: string
+          registration_number?: string | null
           school?: string
           status?: string
           updated_at?: string
