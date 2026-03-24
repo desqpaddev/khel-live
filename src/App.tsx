@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound.tsx";
 import Results from "./pages/Results.tsx";
 import MyTicket from "./pages/MyTicket.tsx";
 import PaymentStatus from "./pages/PaymentStatus.tsx";
+import ChatbotWidget from "@/components/ChatbotWidget";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />
+          <ChatbotWidget />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   Calendar, Users, BarChart3, Trophy, Plus, Edit, Trash2,
-  Search, Download, Medal, Ticket, Percent, QrCode, Settings
+  Search, Download, Medal, Ticket, Percent, QrCode, Settings, MessageCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import AdminLeaderboard from "@/components/AdminLeaderboard";
 import AdminQRScanner from "@/components/AdminQRScanner";
 import AdminSettings from "@/components/AdminSettings";
+import AdminChat from "@/components/AdminChat";
 
 type Event = Tables<"events">;
 type Registration = Tables<"registrations"> & { events?: Event | null };
@@ -405,6 +406,9 @@ const AdminDashboard = () => {
             <TabsTrigger value="leaderboard" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Leaderboard</TabsTrigger>
             <TabsTrigger value="scanner" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
               <QrCode size={14} className="mr-1" /> Scanner
+            </TabsTrigger>
+            <TabsTrigger value="chat" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
+              <MessageCircle size={14} className="mr-1" /> Chat
             </TabsTrigger>
             <TabsTrigger value="settings" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
               <Settings size={14} className="mr-1" /> Settings
@@ -1016,6 +1020,11 @@ const AdminDashboard = () => {
           {/* SCANNER TAB */}
           <TabsContent value="scanner">
             <AdminQRScanner />
+          </TabsContent>
+
+          {/* CHAT TAB */}
+          <TabsContent value="chat">
+            <AdminChat />
           </TabsContent>
 
           {/* SETTINGS TAB */}
