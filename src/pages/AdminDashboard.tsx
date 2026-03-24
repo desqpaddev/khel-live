@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   Calendar, Users, BarChart3, Trophy, Plus, Edit, Trash2,
-  Search, Download, Medal, Ticket, Percent, QrCode
+  Search, Download, Medal, Ticket, Percent, QrCode, Settings
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ import { downloadCertificate } from "@/lib/certificate";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import AdminLeaderboard from "@/components/AdminLeaderboard";
 import AdminQRScanner from "@/components/AdminQRScanner";
+import AdminSettings from "@/components/AdminSettings";
 
 type Event = Tables<"events">;
 type Registration = Tables<"registrations"> & { events?: Event | null };
@@ -379,6 +380,9 @@ const AdminDashboard = () => {
             <TabsTrigger value="leaderboard" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Leaderboard</TabsTrigger>
             <TabsTrigger value="scanner" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
               <QrCode size={14} className="mr-1" /> Scanner
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
+              <Settings size={14} className="mr-1" /> Settings
             </TabsTrigger>
           </TabsList>
 
@@ -974,6 +978,11 @@ const AdminDashboard = () => {
           {/* SCANNER TAB */}
           <TabsContent value="scanner">
             <AdminQRScanner />
+          </TabsContent>
+
+          {/* SETTINGS TAB */}
+          <TabsContent value="settings">
+            <AdminSettings />
           </TabsContent>
         </Tabs>
       </div>
