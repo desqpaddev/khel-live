@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   Calendar, Users, BarChart3, Trophy, Plus, Edit, Trash2,
-  Search, Download, Medal, Ticket, Percent, QrCode, Settings, MessageCircle
+  Search, Download, Medal, Ticket, Percent, QrCode, Settings, MessageCircle, IndianRupee
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,7 @@ import AdminQRScanner from "@/components/AdminQRScanner";
 import AdminSettings from "@/components/AdminSettings";
 import AdminChat from "@/components/AdminChat";
 import AdminUserManagement from "@/components/AdminUserManagement";
+import AdminFinance from "@/components/AdminFinance";
 
 type Event = Tables<"events">;
 type Registration = Tables<"registrations"> & { events?: Event | null };
@@ -407,6 +408,7 @@ const AdminDashboard = () => {
             { value: "registrations", label: "Registrations", resource: "registrations" },
             { value: "results", label: "Results", resource: "results" },
             { value: "users", label: "Users", resource: "users" },
+            { value: "finance", label: "Finance", resource: "finance", icon: <IndianRupee size={14} className="mr-1" /> },
             { value: "analytics", label: "Analytics", resource: "analytics" },
             { value: "leaderboard", label: "Leaderboard", resource: "results" },
             { value: "scanner", label: "Scanner", resource: "scanner", icon: <QrCode size={14} className="mr-1" /> },
@@ -893,6 +895,11 @@ const AdminDashboard = () => {
           {/* USERS TAB */}
           <TabsContent value="users">
             <AdminUserManagement />
+          </TabsContent>
+
+          {/* FINANCE TAB */}
+          <TabsContent value="finance">
+            <AdminFinance events={events} registrations={registrations} />
           </TabsContent>
 
           {/* ANALYTICS TAB */}
