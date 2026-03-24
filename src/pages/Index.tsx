@@ -6,6 +6,7 @@ import { Trophy, ChevronRight, Star, Medal, Flame } from "lucide-react";
 import EventCard from "@/components/EventCard";
 import HeroVideoSlider from "@/components/HeroVideoSlider";
 import SportCategoryCarousel from "@/components/SportCategoryCarousel";
+import TestimonialSection from "@/components/TestimonialSection";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -122,6 +123,9 @@ const Index = () => {
           </div>
         </section>
       )}
+
+      {/* Testimonials */}
+      <TestimonialSection />
 
       {/* CTA Section */}
       <section className="relative py-28 overflow-hidden section-dark">
