@@ -702,7 +702,8 @@ const AdminDashboard = () => {
                 <tbody>
                   {filteredRegs.map((r) => (
                     <tr key={r.id} className="border-t border-border">
-                      <td className="p-3 text-foreground font-medium">{r.child_name}<br /><span className="text-xs text-muted-foreground">{r.parent_name}</span></td>
+                      <td className="p-3"><Badge variant="outline" className="font-mono text-xs">{(r as any).registration_number || "—"}</Badge></td>
+                      <td className="p-3 text-foreground font-medium">{(r as any).first_name ? `${(r as any).first_name} ${(r as any).last_name || ""}` : r.child_name}<br /><span className="text-xs text-muted-foreground">{r.parent_name}</span></td>
                       <td className="p-3 text-foreground">{r.events?.title}</td>
                       <td className="p-3 text-foreground">{r.age_group}</td>
                       <td className="p-3 text-foreground">{r.school}</td>
