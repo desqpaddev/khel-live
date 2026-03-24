@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["'Space Grotesk'", "sans-serif"],
-        sans: ["'Space Grotesk'", "system-ui", "sans-serif"],
+        display: ["'Oswald'", "sans-serif"],
+        sans: ["'Inter'", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -52,10 +52,10 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         khelium: {
+          red: "hsl(var(--khelium-red))",
           orange: "hsl(var(--khelium-orange))",
-          gold: "hsl(var(--khelium-gold))",
           navy: "hsl(var(--khelium-navy))",
-          dark: "hsl(var(--khelium-dark))",
+          light: "hsl(var(--khelium-light))",
           surface: "hsl(var(--khelium-surface))",
           glow: "hsl(var(--khelium-glow))",
         },
