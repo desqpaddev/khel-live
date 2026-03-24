@@ -188,7 +188,7 @@ const AdminDashboard = () => {
   };
 
   const saveDiscount = async () => {
-    const payload: Record<string, unknown> = {
+    const payload = {
       event_id: discountForm.event_id || null,
       ticket_id: discountForm.ticket_id || null,
       discount_type: discountForm.discount_type,
@@ -205,11 +205,11 @@ const AdminDashboard = () => {
       valid_until: discountForm.valid_until || null,
     };
     if (editingDiscountId) {
-      const { error } = await supabase.from("discounts").update(payload).eq("id", editingDiscountId);
+      const { error } = await supabase.from("discounts").update(payload as any).eq("id", editingDiscountId);
       if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
       toast({ title: "Discount updated ✅" });
     } else {
-      const { error } = await supabase.from("discounts").insert(payload);
+      const { error } = await supabase.from("discounts").insert(payload as any);
       if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
       toast({ title: "Discount created 🎉" });
     }
