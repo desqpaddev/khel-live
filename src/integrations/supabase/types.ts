@@ -14,6 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
+      discounts: {
+        Row: {
+          affiliate_source: string | null
+          code: string | null
+          created_at: string
+          description: string | null
+          discount_type: string
+          discount_unit: string
+          discount_value: number
+          event_id: string | null
+          id: string
+          is_active: boolean
+          max_uses: number | null
+          min_group_size: number | null
+          min_past_events: number | null
+          name: string
+          ticket_id: string | null
+          updated_at: string
+          used_count: number
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          affiliate_source?: string | null
+          code?: string | null
+          created_at?: string
+          description?: string | null
+          discount_type: string
+          discount_unit?: string
+          discount_value?: number
+          event_id?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          min_group_size?: number | null
+          min_past_events?: number | null
+          name: string
+          ticket_id?: string | null
+          updated_at?: string
+          used_count?: number
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          affiliate_source?: string | null
+          code?: string | null
+          created_at?: string
+          description?: string | null
+          discount_type?: string
+          discount_unit?: string
+          discount_value?: number
+          event_id?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          min_group_size?: number | null
+          min_past_events?: number | null
+          name?: string
+          ticket_id?: string | null
+          updated_at?: string
+          used_count?: number
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discounts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discounts_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           age_groups: string[]

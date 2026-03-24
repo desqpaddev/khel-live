@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, MapPin, Users, Clock, ArrowLeft, Shield, Award, Heart, Ticket } from "lucide-react";
+import { Calendar, MapPin, Users, Clock, ArrowLeft, Shield, Award, Heart, Ticket, Tag, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,10 @@ const EventDetail = () => {
   const [spotsLeft, setSpotsLeft] = useState(0);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [discountCode, setDiscountCode] = useState("");
+  const [appliedDiscount, setAppliedDiscount] = useState<{ name: string; value: number; unit: string } | null>(null);
+  const [discountError, setDiscountError] = useState("");
+  const [applyingCode, setApplyingCode] = useState(false);
 
   const [formData, setFormData] = useState({
     childName: "", parentName: "", email: "", phone: "", school: "", ageGroup: "", board: "",
@@ -69,6 +73,44 @@ const EventDetail = () => {
 
   const spotsPercent = ((event.total_spots - spotsLeft) / event.total_spots) * 100;
   const displayPrice = selectedTicket ? selectedTicket.price : event.price;
+
+  const applyDiscountCode = async () => {
+    if (!discountCode.trim()) return;
+    setApplyingCode(true);
+    setDiscountError("");
+    setAppliedDiscount(null);
+
+    const { data, error } = await supabase
+      .from("discounts")
+      .select("*")
+      .eq("code", discountCode.trim().toUpperCase())
+      .eq("is_active", true)
+      .single();
+
+    if (error || !data) {
+      setDiscountError("Invalid or expired discount code");
+      setApplyingCode(false);
+      return;
+    }
+
+    const d = data as any;
+    const now = new Date();
+    if (d.valid_from && new Date(d.valid_from) > now) { setDiscountError("This code is not active yet"); setApplyingCode(false); return; }
+    if (d.valid_until && new Date(d.valid_until) < now) { setDiscountError("This code has expired"); setApplyingCode(false); return; }
+    if (d.max_uses && d.used_count >= d.max_uses) { setDiscountError("This code has reached its usage limit"); setApplyingCode(false); return; }
+    if (d.event_id && d.event_id !== event.id) { setDiscountError("This code is not valid for this event"); setApplyingCode(false); return; }
+    if (d.ticket_id && selectedTicket && d.ticket_id !== selectedTicket.id) { setDiscountError("This code is not valid for this ticket type"); setApplyingCode(false); return; }
+
+    setAppliedDiscount({ name: d.name, value: d.discount_value, unit: d.discount_unit });
+    setApplyingCode(false);
+  };
+
+  const discountAmount = appliedDiscount
+    ? appliedDiscount.unit === "percent"
+      ? Math.round(displayPrice * appliedDiscount.value / 100)
+      : Math.min(appliedDiscount.value, displayPrice)
+    : 0;
+  const finalPrice = displayPrice - discountAmount;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -284,8 +326,43 @@ const EventDetail = () => {
                       </Select>
                     </div>
                   </div>
+
+                  {/* Discount Code */}
+                  <div className="border border-dashed border-border rounded-lg p-3 space-y-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1"><Tag size={12} /> Discount Code</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={discountCode}
+                        onChange={(e) => { setDiscountCode(e.target.value.toUpperCase()); setDiscountError(""); }}
+                        placeholder="Enter code"
+                        className="font-mono text-sm flex-1"
+                        disabled={!!appliedDiscount}
+                      />
+                      {appliedDiscount ? (
+                        <Button type="button" variant="outline" size="sm" onClick={() => { setAppliedDiscount(null); setDiscountCode(""); }} className="text-xs shrink-0">Remove</Button>
+                      ) : (
+                        <Button type="button" variant="outline" size="sm" onClick={applyDiscountCode} disabled={applyingCode || !discountCode.trim()} className="text-xs shrink-0">{applyingCode ? "..." : "Apply"}</Button>
+                      )}
+                    </div>
+                    {discountError && <p className="text-xs text-destructive">{discountError}</p>}
+                    {appliedDiscount && (
+                      <div className="flex items-center gap-1 text-xs text-green-600">
+                        <Check size={12} /> {appliedDiscount.name} — {appliedDiscount.unit === "percent" ? `${appliedDiscount.value}% off` : `₹${appliedDiscount.value} off`}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Price Summary */}
+                  {discountAmount > 0 && (
+                    <div className="bg-secondary rounded-lg p-3 space-y-1 text-sm">
+                      <div className="flex justify-between text-muted-foreground"><span>Ticket Price</span><span>₹{displayPrice}</span></div>
+                      <div className="flex justify-between text-green-600"><span>Discount</span><span>-₹{discountAmount}</span></div>
+                      <div className="flex justify-between font-bold text-foreground border-t border-border pt-1"><span>Total</span><span>₹{finalPrice}</span></div>
+                    </div>
+                  )}
+
                   <Button type="submit" disabled={submitting} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow uppercase tracking-wider font-bold" size="lg">
-                    {submitting ? "Registering..." : `Register Now — ₹${displayPrice}`}
+                    {submitting ? "Registering..." : `Register Now — ₹${finalPrice}`}
                   </Button>
                   <p className="text-xs text-muted-foreground text-center">Includes RFID bib, medal, certificate & photo</p>
                 </form>
