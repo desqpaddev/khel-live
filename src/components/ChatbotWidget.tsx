@@ -42,14 +42,9 @@ const ChatbotWidget = () => {
         },
         (payload) => {
           const newMsg = payload.new as any;
-          // Only show messages from admin or bot (not from user, we already have those locally)
-          if (newMsg.sender_type === "admin" || (newMsg.sender_type === "bot" && newMsg.role === "assistant")) {
-            // Avoid duplicates - check if we already have this content as the last message
-            setMessages((prev) => {
-              const last = prev[prev.length - 1];
-              if (last?.role === "assistant" && last.content === newMsg.content) return prev;
-              return [...prev, { role: "assistant" as const, content: newMsg.content }];
-            });
+          // Only show messages from admin (not from user or bot - we handle those locally)
+          if (newMsg.sender_type === "admin") {
+            setMessages((prev) => [...prev, { role: "assistant" as const, content: newMsg.content }]);
           }
         }
       )
