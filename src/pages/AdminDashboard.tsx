@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { Tables } from "@/integrations/supabase/types";
 import { downloadCertificate } from "@/lib/certificate";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import AdminLeaderboard from "@/components/AdminLeaderboard";
 
 type Event = Tables<"events">;
 type Registration = Tables<"registrations"> & { events?: Event | null };
@@ -374,6 +375,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="results" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Results</TabsTrigger>
             <TabsTrigger value="users" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Users</TabsTrigger>
             <TabsTrigger value="analytics" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Analytics</TabsTrigger>
+            <TabsTrigger value="leaderboard" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Leaderboard</TabsTrigger>
           </TabsList>
 
           {/* EVENTS TAB */}
@@ -949,6 +951,11 @@ const AdminDashboard = () => {
                 </div>
               </div>
             </div>
+          </TabsContent>
+
+          {/* LEADERBOARD TAB */}
+          <TabsContent value="leaderboard">
+            <AdminLeaderboard results={results} events={events} registrations={registrations} />
           </TabsContent>
         </Tabs>
       </div>
