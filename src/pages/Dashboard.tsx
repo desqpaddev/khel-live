@@ -269,6 +269,13 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
+                      {(reg as any).registration_number && (
+                        <Link to={`/ticket/${reg.id}`}>
+                          <Button variant="outline" size="sm" className="gap-1 text-xs font-semibold uppercase tracking-wider">
+                            <Ticket size={14} /> View Ticket
+                          </Button>
+                        </Link>
+                      )}
                       {reg.bib_number && (
                         <Badge className="bg-secondary text-secondary-foreground font-semibold">BIB #{reg.bib_number}</Badge>
                       )}
