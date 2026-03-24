@@ -323,7 +323,8 @@ const AdminDashboard = () => {
                     <th className="text-left p-3 text-muted-foreground font-medium">School</th>
                     <th className="text-left p-3 text-muted-foreground font-medium">Status</th>
                     <th className="text-left p-3 text-muted-foreground font-medium">Payment</th>
-                    <th className="text-left p-3 text-muted-foreground font-medium">BIB</th>
+                     <th className="text-left p-3 text-muted-foreground font-medium">BIB</th>
+                     <th className="text-left p-3 text-muted-foreground font-medium">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
