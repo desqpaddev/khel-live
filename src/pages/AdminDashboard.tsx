@@ -952,6 +952,11 @@ const AdminDashboard = () => {
               </div>
             </div>
           </TabsContent>
+
+          {/* LEADERBOARD TAB */}
+          <TabsContent value="leaderboard">
+            <AdminLeaderboard results={results} events={events} registrations={registrations} />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
