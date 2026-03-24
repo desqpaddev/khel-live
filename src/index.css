@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,60 +6,61 @@
 
 @layer base {
   :root {
-    --background: 220 20% 6%;
-    --foreground: 0 0% 96%;
+    --background: 0 0% 100%;
+    --foreground: 220 25% 10%;
 
-    --card: 220 18% 10%;
-    --card-foreground: 0 0% 96%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 10%;
 
-    --popover: 220 18% 10%;
-    --popover-foreground: 0 0% 96%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 10%;
 
-    --primary: 28 100% 55%;
+    --primary: 0 85% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 16% 16%;
-    --secondary-foreground: 0 0% 90%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 20% 25%;
 
-    --muted: 220 14% 14%;
-    --muted-foreground: 220 10% 55%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 46%;
 
-    --accent: 45 100% 50%;
-    --accent-foreground: 220 20% 6%;
+    --accent: 28 100% 52%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 14% 18%;
-    --input: 220 14% 18%;
-    --ring: 28 100% 55%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 0 85% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    --sidebar-background: 220 18% 8%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 28 100% 55%;
+    --sidebar-background: 220 20% 97%;
+    --sidebar-foreground: 220 20% 25%;
+    --sidebar-primary: 0 85% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 16% 16%;
-    --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 220 14% 18%;
-    --sidebar-ring: 28 100% 55%;
+    --sidebar-accent: 220 14% 93%;
+    --sidebar-accent-foreground: 220 20% 25%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 0 85% 50%;
 
     /* Custom tokens */
-    --khelium-orange: 28 100% 55%;
-    --khelium-gold: 45 100% 50%;
-    --khelium-navy: 220 30% 12%;
-    --khelium-dark: 220 20% 6%;
-    --khelium-surface: 220 18% 10%;
-    --khelium-glow: 28 100% 60%;
+    --khelium-red: 0 85% 50%;
+    --khelium-orange: 28 100% 52%;
+    --khelium-navy: 220 30% 15%;
+    --khelium-light: 220 20% 97%;
+    --khelium-surface: 0 0% 100%;
+    --khelium-glow: 0 85% 55%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(220 30% 8%), hsl(220 20% 4%));
-    --gradient-accent: linear-gradient(135deg, hsl(28 100% 55%), hsl(45 100% 50%));
-    --gradient-card: linear-gradient(180deg, hsl(220 18% 12%), hsl(220 18% 8%));
-    --shadow-glow: 0 0 40px -10px hsl(28 100% 55% / 0.4);
-    --shadow-card: 0 8px 32px -8px hsl(0 0% 0% / 0.5);
+    --gradient-hero: linear-gradient(135deg, hsl(220 25% 10%), hsl(0 85% 30%));
+    --gradient-accent: linear-gradient(135deg, hsl(0 85% 50%), hsl(28 100% 52%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(220 14% 97%));
+    --shadow-glow: 0 4px 30px -8px hsl(0 85% 50% / 0.25);
+    --shadow-card: 0 4px 24px -4px hsl(220 25% 10% / 0.08);
 
-    --font-display: 'Space Grotesk', sans-serif;
+    --font-display: 'Oswald', sans-serif;
+    --font-body: 'Inter', sans-serif;
   }
 }
 
@@ -69,12 +70,14 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
   }
 }
 
@@ -94,5 +97,9 @@
   }
   .shadow-card {
     box-shadow: var(--shadow-card);
+  }
+  .section-dark {
+    background-color: hsl(var(--khelium-navy));
+    color: hsl(0 0% 96%);
   }
 }

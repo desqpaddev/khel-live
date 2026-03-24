@@ -18,18 +18,22 @@ const timeline = [
 
 const AboutPage = () => (
   <div className="min-h-screen bg-background pt-20">
-    <div className="container mx-auto px-4 py-16">
-      {/* Heading */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-3xl mx-auto mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-          About <span className="text-gradient">KHELIUM</span>
-        </h1>
-        <p className="text-lg text-muted-foreground leading-relaxed">
-          India's pioneering school sports movement, created to spark every child's journey toward Olympic dreams.
-          From the classroom to the playground, and onward to the podium.
-        </p>
-      </motion.div>
+    {/* Header */}
+    <div className="section-dark">
+      <div className="container mx-auto px-4 py-16 text-center">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <span className="text-sm font-semibold text-primary uppercase tracking-[0.2em]">Who We Are</span>
+          <h1 className="text-4xl md:text-5xl font-bold font-display text-white mt-2 uppercase">
+            About <span className="text-primary">KHELIUM</span>
+          </h1>
+          <p className="text-lg text-gray-400 leading-relaxed max-w-2xl mx-auto mt-4">
+            India's pioneering school sports movement, created to spark every child's journey toward Olympic dreams.
+          </p>
+        </motion.div>
+      </div>
+    </div>
 
+    <div className="container mx-auto px-4 py-16">
       {/* Values */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
         {values.map((v, i) => (
@@ -39,12 +43,12 @@ const AboutPage = () => (
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.08 }}
-            className="p-6 rounded-xl border border-border bg-card"
+            className="p-6 rounded-lg border border-border bg-card shadow-card hover:shadow-glow transition-shadow"
           >
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 text-primary mb-4">
               {v.icon}
             </div>
-            <h3 className="text-lg font-bold text-foreground mb-2">{v.title}</h3>
+            <h3 className="text-lg font-bold font-display text-foreground mb-2 uppercase">{v.title}</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">{v.desc}</p>
           </motion.div>
         ))}
@@ -52,7 +56,7 @@ const AboutPage = () => (
 
       {/* Timeline */}
       <div className="max-w-2xl mx-auto mb-20">
-        <h2 className="text-3xl font-bold text-foreground text-center mb-10">Roadmap</h2>
+        <h2 className="text-3xl font-bold font-display text-foreground text-center mb-10 uppercase">Roadmap</h2>
         <div className="space-y-6">
           {timeline.map((t, i) => (
             <motion.div
@@ -64,13 +68,13 @@ const AboutPage = () => (
               className="flex gap-6 items-start"
             >
               <div className="flex flex-col items-center">
-                <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
+                <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm font-display">
                   {t.year}
                 </div>
                 {i < timeline.length - 1 && <div className="w-0.5 h-12 bg-border mt-2" />}
               </div>
               <div className="pt-2">
-                <p className="text-sm font-semibold text-foreground mb-1">{t.cities}</p>
+                <p className="text-sm font-bold text-foreground mb-1">{t.cities}</p>
                 <p className="text-sm text-muted-foreground">{t.goal}</p>
               </div>
             </motion.div>
@@ -79,9 +83,9 @@ const AboutPage = () => (
       </div>
 
       {/* Organized by */}
-      <div className="text-center p-8 rounded-xl border border-border bg-card">
-        <p className="text-sm text-muted-foreground mb-2">Organized by</p>
-        <p className="text-lg font-bold text-foreground">TDK Sports</p>
+      <div className="text-center p-8 rounded-lg border border-border bg-secondary">
+        <p className="text-sm text-muted-foreground mb-2 uppercase tracking-wider">Organized by</p>
+        <p className="text-lg font-bold font-display text-foreground uppercase">TDK Sports</p>
         <p className="text-sm text-muted-foreground">with Santos King Tours & Travels Pvt Ltd</p>
       </div>
     </div>

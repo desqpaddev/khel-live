@@ -88,9 +88,9 @@ const Dashboard = () => {
   };
 
   const medalColor: Record<string, string> = {
-    gold: "bg-accent text-accent-foreground",
-    silver: "bg-secondary text-secondary-foreground",
-    bronze: "bg-khelium-orange/20 text-primary",
+    gold: "bg-yellow-100 text-yellow-800 border-yellow-300",
+    silver: "bg-gray-100 text-gray-700 border-gray-300",
+    bronze: "bg-orange-100 text-orange-800 border-orange-300",
   };
 
   if (loading) {
@@ -101,7 +101,7 @@ const Dashboard = () => {
     );
   }
 
-  const EventGrid = ({ events, label, emptyMsg }: { events: Event[]; label: string; emptyMsg: string }) => (
+  const EventGrid = ({ events, emptyMsg }: { events: Event[]; emptyMsg: string }) => (
     <div>
       {events.length === 0 ? (
         <p className="text-center text-muted-foreground py-8">{emptyMsg}</p>
@@ -114,15 +114,15 @@ const Dashboard = () => {
                 key={ev.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-xl border border-border bg-card overflow-hidden"
+                className="rounded-lg border border-border bg-card overflow-hidden shadow-card"
               >
-                <div className="h-1 w-full bg-gradient-to-r from-primary to-accent" />
+                <div className="h-1 w-full bg-primary" />
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-2 mb-2">
-                    <Badge variant="secondary" className="text-xs bg-secondary text-secondary-foreground">{ev.sport}</Badge>
-                    {isRegistered && <Badge className="text-xs bg-green-500/10 text-green-400 border-green-500/20">Registered</Badge>}
+                    <Badge className="text-xs bg-primary/10 text-primary border-primary/20 font-semibold uppercase">{ev.sport}</Badge>
+                    {isRegistered && <Badge className="text-xs bg-green-100 text-green-700 border-green-300">Registered</Badge>}
                   </div>
-                  <h3 className="font-bold text-foreground mb-2 text-sm">{ev.title}</h3>
+                  <h3 className="font-bold font-display text-foreground mb-2 text-sm uppercase">{ev.title}</h3>
                   <div className="space-y-1 text-xs text-muted-foreground mb-3">
                     <div className="flex items-center gap-1.5"><Calendar size={12} className="text-primary" /> {ev.event_date} · {ev.event_time}</div>
                     <div className="flex items-center gap-1.5"><MapPin size={12} className="text-primary" /> {ev.venue}, {ev.city}</div>
@@ -130,7 +130,7 @@ const Dashboard = () => {
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-foreground">₹{ev.price}</span>
                     <Link to={`/events/${ev.id}`}>
-                      <Button size="sm" className={isRegistered ? "bg-secondary text-secondary-foreground" : "bg-primary text-primary-foreground"}>
+                      <Button size="sm" className={isRegistered ? "bg-secondary text-secondary-foreground" : "bg-primary text-primary-foreground uppercase text-xs font-semibold"}>
                         {isRegistered ? "View" : "Book Now"} <ArrowRight size={14} className="ml-1" />
                       </Button>
                     </Link>
@@ -145,74 +145,79 @@ const Dashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background pt-20">
-      <div className="container mx-auto px-4 py-10">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">My Dashboard</h1>
-            <p className="text-muted-foreground">{user?.email}</p>
+    <div className="min-h-screen bg-secondary pt-20">
+      {/* Header */}
+      <div className="bg-background border-b border-border">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold font-display text-foreground uppercase">My Dashboard</h1>
+              <p className="text-muted-foreground">{user?.email}</p>
+            </div>
+            <Button variant="outline" onClick={signOut} className="gap-2">
+              <LogOut size={16} /> Sign Out
+            </Button>
           </div>
-          <Button variant="outline" onClick={signOut} className="border-border text-foreground gap-2">
-            <LogOut size={16} /> Sign Out
-          </Button>
         </div>
+      </div>
 
+      <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="events" className="space-y-6">
           <TabsList className="bg-card border border-border flex-wrap">
-            <TabsTrigger value="events" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger value="events" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
               <Flame size={14} className="mr-2" /> Events
             </TabsTrigger>
-            <TabsTrigger value="registrations" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <Calendar size={14} className="mr-2" /> My Registrations
+            <TabsTrigger value="registrations" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
+              <Calendar size={14} className="mr-2" /> Registrations
             </TabsTrigger>
-            <TabsTrigger value="results" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger value="results" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
               <Trophy size={14} className="mr-2" /> Results
             </TabsTrigger>
-            <TabsTrigger value="profile" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger value="profile" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
               <User size={14} className="mr-2" /> Profile
             </TabsTrigger>
           </TabsList>
 
-          {/* Events - Upcoming / Ongoing / Past */}
+          {/* Events */}
           <TabsContent value="events" className="space-y-8">
             {categorizedEvents.ongoing.length > 0 && (
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                  <h2 className="text-lg font-bold text-foreground">Ongoing Events</h2>
-                  <Badge className="bg-green-500/10 text-green-400 text-xs">{categorizedEvents.ongoing.length}</Badge>
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <h2 className="text-lg font-bold font-display text-foreground uppercase">Ongoing Events</h2>
+                  <Badge className="bg-green-100 text-green-700 text-xs">{categorizedEvents.ongoing.length}</Badge>
                 </div>
-                <EventGrid events={categorizedEvents.ongoing} label="Ongoing" emptyMsg="" />
+                <EventGrid events={categorizedEvents.ongoing} emptyMsg="" />
               </div>
             )}
 
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Clock size={18} className="text-primary" />
-                <h2 className="text-lg font-bold text-foreground">Upcoming Events</h2>
+                <h2 className="text-lg font-bold font-display text-foreground uppercase">Upcoming Events</h2>
                 <Badge className="bg-primary/10 text-primary text-xs">{categorizedEvents.upcoming.length}</Badge>
               </div>
-              <EventGrid events={categorizedEvents.upcoming} label="Upcoming" emptyMsg="No upcoming events at the moment" />
+              <EventGrid events={categorizedEvents.upcoming} emptyMsg="No upcoming events at the moment" />
             </div>
 
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <History size={18} className="text-muted-foreground" />
-                <h2 className="text-lg font-bold text-foreground">Past Events</h2>
+                <h2 className="text-lg font-bold font-display text-foreground uppercase">Past Events</h2>
                 <Badge className="bg-secondary text-secondary-foreground text-xs">{categorizedEvents.past.length}</Badge>
               </div>
-              <EventGrid events={categorizedEvents.past} label="Past" emptyMsg="No past events yet" />
+              <EventGrid events={categorizedEvents.past} emptyMsg="No past events yet" />
             </div>
           </TabsContent>
 
           {/* Registrations */}
           <TabsContent value="registrations">
             {registrations.length === 0 ? (
-              <div className="text-center py-16 border border-border rounded-xl bg-card">
+              <div className="text-center py-16 border border-border rounded-lg bg-card">
                 <p className="text-2xl mb-2">🏟️</p>
                 <p className="text-muted-foreground mb-4">No registrations yet</p>
                 <Link to="/events">
-                  <Button className="bg-primary text-primary-foreground">Browse Events</Button>
+                  <Button className="bg-primary text-primary-foreground uppercase font-semibold">Browse Events</Button>
                 </Link>
               </div>
             ) : (
@@ -222,10 +227,10 @@ const Dashboard = () => {
                     key={reg.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-5 rounded-xl border border-border bg-card flex flex-col md:flex-row md:items-center justify-between gap-4"
+                    className="p-5 rounded-lg border border-border bg-card flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-card"
                   >
                     <div>
-                      <Link to={`/events/${reg.event_id}`} className="font-bold text-foreground hover:text-primary transition-colors">{reg.events?.title || "Event"}</Link>
+                      <Link to={`/events/${reg.event_id}`} className="font-bold font-display text-foreground hover:text-primary transition-colors uppercase">{reg.events?.title || "Event"}</Link>
                       <div className="flex flex-wrap gap-3 mt-2 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1"><Calendar size={14} /> {reg.events?.event_date}</span>
                         <span className="flex items-center gap-1"><MapPin size={14} /> {reg.events?.city}</span>
@@ -235,12 +240,12 @@ const Dashboard = () => {
                     </div>
                     <div className="flex items-center gap-3">
                       {reg.bib_number && (
-                        <Badge className="bg-secondary text-secondary-foreground">BIB #{reg.bib_number}</Badge>
+                        <Badge className="bg-secondary text-secondary-foreground font-semibold">BIB #{reg.bib_number}</Badge>
                       )}
-                      <Badge className={reg.status === "confirmed" ? "bg-green-500/10 text-green-400" : "bg-secondary text-secondary-foreground"}>
+                      <Badge className={reg.status === "confirmed" ? "bg-green-100 text-green-700 border-green-300" : "bg-secondary text-secondary-foreground"}>
                         {reg.status}
                       </Badge>
-                      <Badge className={reg.payment_status === "paid" ? "bg-primary/10 text-primary" : "bg-accent/10 text-accent"}>
+                      <Badge className={reg.payment_status === "paid" ? "bg-primary/10 text-primary" : "bg-yellow-100 text-yellow-800"}>
                         {reg.payment_status}
                       </Badge>
                     </div>
@@ -253,16 +258,16 @@ const Dashboard = () => {
           {/* Results */}
           <TabsContent value="results">
             {results.length === 0 ? (
-              <div className="text-center py-16 border border-border rounded-xl bg-card">
+              <div className="text-center py-16 border border-border rounded-lg bg-card">
                 <p className="text-2xl mb-2">🏆</p>
                 <p className="text-muted-foreground">No results published yet</p>
               </div>
             ) : (
               <div className="grid gap-4">
                 {results.map((result) => (
-                  <div key={result.id} className="p-5 rounded-xl border border-border bg-card">
+                  <div key={result.id} className="p-5 rounded-lg border border-border bg-card shadow-card">
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-bold text-foreground">{result.events?.title}</h3>
+                      <h3 className="font-bold font-display text-foreground uppercase">{result.events?.title}</h3>
                       {result.medal && (
                         <Badge className={medalColor[result.medal] || "bg-secondary text-secondary-foreground"}>
                           🏅 {result.medal.toUpperCase()}
@@ -271,22 +276,22 @@ const Dashboard = () => {
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       {result.position && (
-                        <div><span className="text-muted-foreground">Position</span><p className="font-bold text-foreground">#{result.position}</p></div>
+                        <div><span className="text-muted-foreground text-xs uppercase tracking-wider">Position</span><p className="font-bold text-foreground">#{result.position}</p></div>
                       )}
                       {result.time_recorded && (
-                        <div><span className="text-muted-foreground">Time</span><p className="font-bold text-foreground">{result.time_recorded}</p></div>
+                        <div><span className="text-muted-foreground text-xs uppercase tracking-wider">Time</span><p className="font-bold text-foreground">{result.time_recorded}</p></div>
                       )}
                       {result.distance_recorded && (
-                        <div><span className="text-muted-foreground">Distance</span><p className="font-bold text-foreground">{result.distance_recorded}</p></div>
+                        <div><span className="text-muted-foreground text-xs uppercase tracking-wider">Distance</span><p className="font-bold text-foreground">{result.distance_recorded}</p></div>
                       )}
                       {result.score !== null && (
-                        <div><span className="text-muted-foreground">Score</span><p className="font-bold text-foreground">{result.score}</p></div>
+                        <div><span className="text-muted-foreground text-xs uppercase tracking-wider">Score</span><p className="font-bold text-foreground">{result.score}</p></div>
                       )}
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="mt-3 text-primary gap-2"
+                      className="mt-3 text-primary gap-2 font-semibold"
                       onClick={() => {
                         const reg = registrations.find(r => r.id === result.registration_id);
                         downloadCertificate({
@@ -315,18 +320,18 @@ const Dashboard = () => {
 
           {/* Profile */}
           <TabsContent value="profile">
-            <div className="max-w-lg rounded-xl border border-border bg-card p-6">
-              <h2 className="text-xl font-bold text-foreground mb-4">Edit Profile</h2>
+            <div className="max-w-lg rounded-lg border border-border bg-card p-6 shadow-card">
+              <h2 className="text-xl font-bold font-display text-foreground mb-4 uppercase">Edit Profile</h2>
               <div className="space-y-4">
-                <div><Label className="text-foreground text-xs">Full Name</Label><Input value={editProfile.full_name} onChange={(e) => setEditProfile({ ...editProfile, full_name: e.target.value })} className="bg-muted border-border text-foreground" /></div>
-                <div><Label className="text-foreground text-xs">Phone</Label><Input value={editProfile.phone} onChange={(e) => setEditProfile({ ...editProfile, phone: e.target.value })} className="bg-muted border-border text-foreground" /></div>
-                <div><Label className="text-foreground text-xs">School</Label><Input value={editProfile.school} onChange={(e) => setEditProfile({ ...editProfile, school: e.target.value })} className="bg-muted border-border text-foreground" /></div>
-                <div><Label className="text-foreground text-xs">City</Label><Input value={editProfile.city} onChange={(e) => setEditProfile({ ...editProfile, city: e.target.value })} className="bg-muted border-border text-foreground" /></div>
+                <div><Label className="text-xs font-semibold uppercase tracking-wider">Full Name</Label><Input value={editProfile.full_name} onChange={(e) => setEditProfile({ ...editProfile, full_name: e.target.value })} /></div>
+                <div><Label className="text-xs font-semibold uppercase tracking-wider">Phone</Label><Input value={editProfile.phone} onChange={(e) => setEditProfile({ ...editProfile, phone: e.target.value })} /></div>
+                <div><Label className="text-xs font-semibold uppercase tracking-wider">School</Label><Input value={editProfile.school} onChange={(e) => setEditProfile({ ...editProfile, school: e.target.value })} /></div>
+                <div><Label className="text-xs font-semibold uppercase tracking-wider">City</Label><Input value={editProfile.city} onChange={(e) => setEditProfile({ ...editProfile, city: e.target.value })} /></div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-foreground text-xs">Board</Label>
+                    <Label className="text-xs font-semibold uppercase tracking-wider">Board</Label>
                     <Select value={editProfile.board} onValueChange={(v) => setEditProfile({ ...editProfile, board: v })}>
-                      <SelectTrigger className="bg-muted border-border text-foreground"><SelectValue placeholder="Select" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="CBSE">CBSE</SelectItem>
                         <SelectItem value="ICSE">ICSE</SelectItem>
@@ -335,9 +340,9 @@ const Dashboard = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-foreground text-xs">Age Group</Label>
+                    <Label className="text-xs font-semibold uppercase tracking-wider">Age Group</Label>
                     <Select value={editProfile.age_group} onValueChange={(v) => setEditProfile({ ...editProfile, age_group: v })}>
-                      <SelectTrigger className="bg-muted border-border text-foreground"><SelectValue placeholder="Select" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                       <SelectContent>
                         {["U10", "U12", "U14", "U16", "U18"].map((a) => (
                           <SelectItem key={a} value={a}>{a}</SelectItem>
@@ -346,8 +351,8 @@ const Dashboard = () => {
                     </Select>
                   </div>
                 </div>
-                <Button onClick={saveProfile} disabled={saving} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                  {saving ? "Saving..." : "Save Profile"}
+                <Button onClick={saveProfile} disabled={saving} className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-wider font-bold">
+                  {saving ? "Saving..." : "Save Changes"}
                 </Button>
               </div>
             </div>
