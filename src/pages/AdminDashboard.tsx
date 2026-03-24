@@ -250,20 +250,40 @@ const AdminDashboard = () => {
     return map[t] || t;
   };
 
+  const uploadEventImage = async (eventId: string): Promise<string | null> => {
+    if (!imageFile) return eventForm.image_url || null;
+    setUploadingImage(true);
+    const ext = imageFile.name.split(".").pop();
+    const filePath = `${eventId}.${ext}`;
+    // Remove old image if exists
+    await supabase.storage.from("event-images").remove([filePath]);
+    const { error } = await supabase.storage.from("event-images").upload(filePath, imageFile, { upsert: true });
+    setUploadingImage(false);
+    if (error) { toast({ title: "Image upload failed", description: error.message, variant: "destructive" }); return null; }
+    const { data: urlData } = supabase.storage.from("event-images").getPublicUrl(filePath);
+    return urlData.publicUrl;
+  };
+
   const saveEvent = async () => {
-    const payload = { ...eventForm, created_by: user!.id, age_groups: eventForm.age_groups };
+    const { image_url, ...formFields } = eventForm;
+    const payload = { ...formFields, created_by: user!.id, age_groups: eventForm.age_groups } as any;
     if (editingEventId) {
+      const imgUrl = await uploadEventImage(editingEventId);
+      if (imgUrl) payload.image_url = imgUrl;
       const { error } = await supabase.from("events").update(payload).eq("id", editingEventId);
       if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
       toast({ title: "Event updated ✅" });
     } else {
-      const { error } = await supabase.from("events").insert(payload);
-      if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+      const { data, error } = await supabase.from("events").insert(payload).select("id").single();
+      if (error || !data) { toast({ title: "Error", description: error?.message || "Failed", variant: "destructive" }); return; }
+      const imgUrl = await uploadEventImage(data.id);
+      if (imgUrl) await supabase.from("events").update({ image_url: imgUrl } as any).eq("id", data.id);
       toast({ title: "Event created 🎉" });
     }
     setEventDialogOpen(false);
     setEditingEventId(null);
     setEventForm(emptyEvent);
+    setImageFile(null);
     fetchAll();
   };
 
