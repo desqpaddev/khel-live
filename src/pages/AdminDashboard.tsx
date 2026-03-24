@@ -23,12 +23,33 @@ type Event = Tables<"events">;
 type Registration = Tables<"registrations"> & { events?: Event | null };
 type Result = Tables<"results"> & { registrations?: Tables<"registrations"> | null; events?: Event | null };
 
+type TicketRow = {
+  id: string;
+  event_id: string;
+  ticket_type: string;
+  description: string | null;
+  price: number;
+  quantity: number;
+  sale_start: string | null;
+  sale_end: string | null;
+  attendee_message: string | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  events?: Event | null;
+};
+
 const COLORS = ["hsl(0,85%,50%)", "hsl(28,100%,52%)", "hsl(220,50%,50%)", "hsl(150,50%,45%)", "hsl(45,90%,50%)"];
 
 const emptyEvent = {
   title: "", sport: "", category: "", city: "", venue: "",
   event_date: "", event_time: "", age_groups: [] as string[],
   price: 0, total_spots: 100, description: "", featured: false, status: "upcoming",
+};
+
+const emptyTicket = {
+  event_id: "", ticket_type: "", description: "", price: 0, quantity: 100,
+  sale_start: "", sale_end: "", attendee_message: "", status: "active",
 };
 
 const BibAssigner = ({ registration, onUpdate }: { registration: Registration; onUpdate: () => void }) => {
