@@ -318,7 +318,8 @@ const AdminDashboard = () => {
   const filteredRegs = registrations.filter((r) =>
     !searchReg || r.child_name.toLowerCase().includes(searchReg.toLowerCase()) ||
     r.parent_name.toLowerCase().includes(searchReg.toLowerCase()) ||
-    r.events?.title?.toLowerCase().includes(searchReg.toLowerCase())
+    r.events?.title?.toLowerCase().includes(searchReg.toLowerCase()) ||
+    (r as any).registration_number?.toLowerCase().includes(searchReg.toLowerCase())
   );
 
   const ageGroupOptions = ["U10", "U12", "U14", "U16", "U18"];
