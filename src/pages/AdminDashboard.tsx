@@ -963,6 +963,11 @@ const AdminDashboard = () => {
           <TabsContent value="leaderboard">
             <AdminLeaderboard results={results} events={events} registrations={registrations} />
           </TabsContent>
+
+          {/* SCANNER TAB */}
+          <TabsContent value="scanner">
+            <AdminQRScanner />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
