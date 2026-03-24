@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Html5Qrcode } from "html5-qrcode";
-import { QrCode, CheckCircle2, XCircle, Search, Camera, CameraOff } from "lucide-react";
+import { QrCode, CheckCircle2, XCircle, Search, Camera, CameraOff, Download, RefreshCw } from "lucide-react";
+import * as XLSX from "xlsx";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +20,18 @@ interface ScannedAttendee {
   bib_number: string | null;
 }
 
+interface CheckedInRecord {
+  registration_number: string;
+  first_name: string;
+  last_name: string;
+  child_name: string;
+  event_title: string;
+  checked_in_at: string;
+  bib_number: string | null;
+  email: string;
+  phone: string;
+}
+
 const AdminQRScanner = () => {
   const { toast } = useToast();
   const [scanning, setScanning] = useState(false);
@@ -26,6 +39,8 @@ const AdminQRScanner = () => {
   const [scannedAttendee, setScannedAttendee] = useState<ScannedAttendee | null>(null);
   const [error, setError] = useState("");
   const [processing, setProcessing] = useState(false);
+  const [checkedInList, setCheckedInList] = useState<CheckedInRecord[]>([]);
+  const [loadingList, setLoadingList] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const containerId = "qr-reader";
 
@@ -58,6 +73,50 @@ const AdminQRScanner = () => {
   useEffect(() => {
     return () => { stopScanner(); };
   }, []);
+
+  const fetchCheckedInList = useCallback(async () => {
+    setLoadingList(true);
+    const { data } = await supabase
+      .from("registrations")
+      .select("registration_number, first_name, last_name, child_name, email, phone, bib_number, checked_in_at, events(title)")
+      .eq("checked_in", true)
+      .order("checked_in_at", { ascending: false });
+
+    if (data) {
+      setCheckedInList(data.map((r: any) => ({
+        registration_number: r.registration_number || "",
+        first_name: r.first_name || "",
+        last_name: r.last_name || "",
+        child_name: r.child_name || "",
+        event_title: r.events?.title || "",
+        checked_in_at: r.checked_in_at || "",
+        bib_number: r.bib_number,
+        email: r.email || "",
+        phone: r.phone || "",
+      })));
+    }
+    setLoadingList(false);
+  }, []);
+
+  useEffect(() => { fetchCheckedInList(); }, [fetchCheckedInList]);
+
+  const downloadExcel = () => {
+    if (!checkedInList.length) return;
+    const rows = checkedInList.map((r, i) => ({
+      "S.No": i + 1,
+      "Reg No": r.registration_number,
+      "Name": r.child_name || `${r.first_name} ${r.last_name}`.trim(),
+      "Event": r.event_title,
+      "BIB": r.bib_number || "-",
+      "Email": r.email,
+      "Phone": r.phone,
+      "Checked In At": r.checked_in_at ? new Date(r.checked_in_at).toLocaleString() : "",
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Checked In");
+    XLSX.writeFile(wb, `checked-in-entries-${new Date().toISOString().slice(0, 10)}.xlsx`);
+  };
 
   const handleScan = async (text: string, scanner: Html5Qrcode) => {
     try { await scanner.stop(); } catch {}
@@ -120,6 +179,7 @@ const AdminQRScanner = () => {
     } else {
       toast({ title: "✅ Check-in confirmed!", description: `${scannedAttendee.first_name || scannedAttendee.child_name} is checked in.` });
       setScannedAttendee({ ...scannedAttendee, checked_in: true, checked_in_at: new Date().toISOString() });
+      fetchCheckedInList();
     }
     setProcessing(false);
   };
@@ -266,6 +326,56 @@ const AdminQRScanner = () => {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Checked-in history */}
+      <div className="rounded-lg border border-border bg-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold font-display uppercase text-sm text-foreground">
+            Checked-In Entries ({checkedInList.length})
+          </h3>
+          <div className="flex gap-2">
+            <Button onClick={fetchCheckedInList} variant="outline" size="sm" className="gap-1" disabled={loadingList}>
+              <RefreshCw size={14} className={loadingList ? "animate-spin" : ""} /> Refresh
+            </Button>
+            <Button onClick={downloadExcel} variant="default" size="sm" className="gap-1" disabled={!checkedInList.length}>
+              <Download size={14} /> Download Excel
+            </Button>
+          </div>
+        </div>
+
+        {checkedInList.length === 0 && !loadingList && (
+          <p className="text-muted-foreground text-center py-6 text-sm">No checked-in entries yet.</p>
+        )}
+
+        {checkedInList.length > 0 && (
+          <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 bg-card">
+                <tr className="border-b border-border text-left text-xs uppercase tracking-wider text-muted-foreground">
+                  <th className="py-2 px-2">#</th>
+                  <th className="py-2 px-2">Reg No</th>
+                  <th className="py-2 px-2">Name</th>
+                  <th className="py-2 px-2">Event</th>
+                  <th className="py-2 px-2">BIB</th>
+                  <th className="py-2 px-2">Checked In At</th>
+                </tr>
+              </thead>
+              <tbody>
+                {checkedInList.map((r, i) => (
+                  <tr key={r.registration_number + i} className="border-b border-border/50 hover:bg-muted/30">
+                    <td className="py-2 px-2 text-muted-foreground">{i + 1}</td>
+                    <td className="py-2 px-2 font-mono font-semibold">{r.registration_number}</td>
+                    <td className="py-2 px-2">{r.child_name || `${r.first_name} ${r.last_name}`.trim()}</td>
+                    <td className="py-2 px-2">{r.event_title}</td>
+                    <td className="py-2 px-2">{r.bib_number || "-"}</td>
+                    <td className="py-2 px-2 text-muted-foreground">{r.checked_in_at ? new Date(r.checked_in_at).toLocaleString() : ""}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
