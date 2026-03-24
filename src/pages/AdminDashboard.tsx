@@ -337,6 +337,9 @@ const AdminDashboard = () => {
                       <td className="p-3"><Badge className={r.status === "confirmed" ? "bg-green-500/10 text-green-400" : "bg-secondary text-secondary-foreground"}>{r.status}</Badge></td>
                       <td className="p-3"><Badge className={r.payment_status === "paid" ? "bg-primary/10 text-primary" : "bg-accent/10 text-accent"}>{r.payment_status}</Badge></td>
                       <td className="p-3 text-foreground">{r.bib_number || "—"}</td>
+                      <td className="p-3">
+                        <BibAssigner registration={r} onUpdate={fetchAll} />
+                      </td>
                     </tr>
                   ))}
                 </tbody>
