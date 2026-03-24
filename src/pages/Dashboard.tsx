@@ -227,10 +227,15 @@ const Dashboard = () => {
                     key={reg.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-5 rounded-lg border border-border bg-card flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-card"
+                     className="p-5 rounded-lg border border-border bg-card flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-card"
                   >
                     <div>
-                      <Link to={`/events/${reg.event_id}`} className="font-bold font-display text-foreground hover:text-primary transition-colors uppercase">{reg.events?.title || "Event"}</Link>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Link to={`/events/${reg.event_id}`} className="font-bold font-display text-foreground hover:text-primary transition-colors uppercase">{reg.events?.title || "Event"}</Link>
+                        {(reg as any).registration_number && (
+                          <Badge className="bg-primary/10 text-primary font-mono font-bold text-xs">{(reg as any).registration_number}</Badge>
+                        )}
+                      </div>
                       <div className="flex flex-wrap gap-3 mt-2 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1"><Calendar size={14} /> {reg.events?.event_date}</span>
                         <span className="flex items-center gap-1"><MapPin size={14} /> {reg.events?.city}</span>
