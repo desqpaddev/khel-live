@@ -350,16 +350,43 @@ const Dashboard = () => {
 
           {/* Profile */}
           <TabsContent value="profile">
-            <div className="max-w-lg rounded-lg border border-border bg-card p-6 shadow-card">
-              <h2 className="text-xl font-bold font-display text-foreground mb-4 uppercase">Edit Profile</h2>
-              <div className="space-y-4">
-                <div><Label className="text-xs font-semibold uppercase tracking-wider">Full Name</Label><Input value={editProfile.full_name} onChange={(e) => setEditProfile({ ...editProfile, full_name: e.target.value })} /></div>
-                <div><Label className="text-xs font-semibold uppercase tracking-wider">Phone</Label><Input value={editProfile.phone} onChange={(e) => setEditProfile({ ...editProfile, phone: e.target.value })} /></div>
-                <div><Label className="text-xs font-semibold uppercase tracking-wider">School</Label><Input value={editProfile.school} onChange={(e) => setEditProfile({ ...editProfile, school: e.target.value })} /></div>
-                <div><Label className="text-xs font-semibold uppercase tracking-wider">City</Label><Input value={editProfile.city} onChange={(e) => setEditProfile({ ...editProfile, city: e.target.value })} /></div>
-                <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Avatar & Basic Info Card */}
+              <div className="rounded-lg border border-border bg-card p-6 shadow-card text-center">
+                <div className="relative inline-block mb-4">
+                  <Avatar className="w-28 h-28 border-4 border-primary/20">
+                    <AvatarImage src={profile?.avatar_url || ""} alt="Profile" />
+                    <AvatarFallback className="bg-primary/10 text-primary text-3xl font-bold">
+                      {editProfile.full_name?.charAt(0)?.toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingAvatar}
+                    className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-2 shadow-lg hover:bg-primary/90 transition-colors"
+                  >
+                    <Camera size={16} />
+                  </button>
+                  <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+                </div>
+                <h3 className="font-bold font-display text-foreground text-lg uppercase">{editProfile.full_name || "Your Name"}</h3>
+                <p className="text-sm text-muted-foreground">{user?.email}</p>
+                {latestReg?.registration_number && (
+                  <Badge className="mt-2 bg-primary/10 text-primary font-mono font-bold">{latestReg.registration_number}</Badge>
+                )}
+                {uploadingAvatar && <p className="text-xs text-muted-foreground mt-2">Uploading...</p>}
+              </div>
+
+              {/* Edit Profile Form */}
+              <div className="lg:col-span-2 rounded-lg border border-border bg-card p-6 shadow-card">
+                <h2 className="text-xl font-bold font-display text-foreground mb-4 uppercase">Edit Profile</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div><Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Full Name</Label><Input value={editProfile.full_name} onChange={(e) => setEditProfile({ ...editProfile, full_name: e.target.value })} /></div>
+                  <div><Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Phone</Label><Input value={editProfile.phone} onChange={(e) => setEditProfile({ ...editProfile, phone: e.target.value })} /></div>
+                  <div><Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">School</Label><Input value={editProfile.school} onChange={(e) => setEditProfile({ ...editProfile, school: e.target.value })} /></div>
+                  <div><Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">City</Label><Input value={editProfile.city} onChange={(e) => setEditProfile({ ...editProfile, city: e.target.value })} /></div>
                   <div>
-                    <Label className="text-xs font-semibold uppercase tracking-wider">Board</Label>
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Board</Label>
                     <Select value={editProfile.board} onValueChange={(v) => setEditProfile({ ...editProfile, board: v })}>
                       <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                       <SelectContent>
@@ -370,7 +397,7 @@ const Dashboard = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs font-semibold uppercase tracking-wider">Age Group</Label>
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Age Group</Label>
                     <Select value={editProfile.age_group} onValueChange={(v) => setEditProfile({ ...editProfile, age_group: v })}>
                       <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                       <SelectContent>
@@ -381,10 +408,50 @@ const Dashboard = () => {
                     </Select>
                   </div>
                 </div>
-                <Button onClick={saveProfile} disabled={saving} className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-wider font-bold">
+                <Button onClick={saveProfile} disabled={saving} className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-wider font-bold">
                   {saving ? "Saving..." : "Save Changes"}
                 </Button>
               </div>
+
+              {/* Registration Details Card */}
+              {latestReg && (
+                <div className="lg:col-span-3 rounded-lg border border-border bg-card p-6 shadow-card">
+                  <h2 className="text-xl font-bold font-display text-foreground mb-4 uppercase">Registration Details</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {[
+                      { label: "First Name", value: latestReg.first_name },
+                      { label: "Last Name", value: latestReg.last_name },
+                      { label: "Email", value: latestReg.email },
+                      { label: "Phone", value: latestReg.phone },
+                      { label: "Date of Birth", value: latestReg.date_of_birth },
+                      { label: "Gender", value: latestReg.gender },
+                      { label: "Address", value: latestReg.address },
+                      { label: "City", value: latestReg.city },
+                      { label: "State / Country", value: latestReg.state_country },
+                      { label: "Pin Code", value: latestReg.pincode },
+                      { label: "Photo ID Type", value: latestReg.photo_id_type },
+                      { label: "ID Number", value: latestReg.id_number },
+                      { label: "Emergency Contact", value: latestReg.emergency_contact_name },
+                      { label: "Emergency Phone", value: latestReg.emergency_contact_phone },
+                      { label: "First Time?", value: latestReg.first_time_participation },
+                      { label: "Blood Group", value: latestReg.blood_group },
+                      { label: "Swimming Expertise", value: latestReg.swimming_expertise },
+                      { label: "Club / Organization", value: latestReg.club_organization },
+                      { label: "Airport Transfer", value: latestReg.airport_transfer },
+                      { label: "Hotel Accommodation", value: latestReg.hotel_accommodation },
+                      { label: "Event T-Shirt", value: latestReg.event_tshirt },
+                      { label: "Breakfast", value: latestReg.breakfast_preference },
+                      { label: "BIB Number", value: latestReg.bib_number },
+                      { label: "Reg ID", value: latestReg.registration_number },
+                    ].filter(item => item.value).map((item) => (
+                      <div key={item.label}>
+                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{item.label}</span>
+                        <p className="text-sm font-medium text-foreground mt-0.5">{item.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>
