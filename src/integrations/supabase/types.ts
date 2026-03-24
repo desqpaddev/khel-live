@@ -206,6 +206,8 @@ export type Database = {
           blood_group: string | null
           board: string | null
           breakfast_preference: string | null
+          checked_in: boolean
+          checked_in_at: string | null
           child_name: string | null
           city: string | null
           club_organization: string | null
@@ -245,6 +247,8 @@ export type Database = {
           blood_group?: string | null
           board?: string | null
           breakfast_preference?: string | null
+          checked_in?: boolean
+          checked_in_at?: string | null
           child_name?: string | null
           city?: string | null
           club_organization?: string | null
@@ -284,6 +288,8 @@ export type Database = {
           blood_group?: string | null
           board?: string | null
           breakfast_preference?: string | null
+          checked_in?: boolean
+          checked_in_at?: string | null
           child_name?: string | null
           city?: string | null
           club_organization?: string | null

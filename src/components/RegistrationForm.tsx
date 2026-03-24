@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +19,7 @@ interface RegistrationFormProps {
 
 const RegistrationForm = ({ eventId, userId, ticketLabel, finalPrice, onSuccess }: RegistrationFormProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
@@ -40,7 +42,9 @@ const RegistrationForm = ({ eventId, userId, ticketLabel, finalPrice, onSuccess 
     }
     setSubmitting(true);
 
-    const { error } = await supabase.from("registrations").insert({
+    const regId = crypto.randomUUID();
+    const { data, error } = await supabase.from("registrations").insert({
+      id: regId,
       event_id: eventId,
       user_id: userId,
       first_name: form.firstName,
@@ -71,13 +75,15 @@ const RegistrationForm = ({ eventId, userId, ticketLabel, finalPrice, onSuccess 
       event_tshirt: form.eventTshirt,
       breakfast_preference: form.breakfastPreference,
       terms_accepted: form.termsAccepted,
-    } as any);
+    } as any).select().single();
 
     if (error) {
       toast({ title: "Registration failed", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Registration Submitted! 🎉", description: `${form.firstName} ${form.lastName} has been registered.` });
+      toast({ title: "Registration Submitted! 🎉", description: `${form.firstName} ${form.lastName} has been registered. Redirecting to your ticket...` });
       onSuccess();
+      // Navigate to the ticket page
+      setTimeout(() => navigate(`/ticket/${data?.id || regId}`), 1500);
     }
     setSubmitting(false);
   };

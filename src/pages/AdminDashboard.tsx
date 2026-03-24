@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   Calendar, Users, BarChart3, Trophy, Plus, Edit, Trash2,
-  Search, Download, Medal, Ticket, Percent
+  Search, Download, Medal, Ticket, Percent, QrCode
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import { downloadCertificate } from "@/lib/certificate";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import AdminLeaderboard from "@/components/AdminLeaderboard";
+import AdminQRScanner from "@/components/AdminQRScanner";
 
 type Event = Tables<"events">;
 type Registration = Tables<"registrations"> & { events?: Event | null };
@@ -376,6 +377,9 @@ const AdminDashboard = () => {
             <TabsTrigger value="users" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Users</TabsTrigger>
             <TabsTrigger value="analytics" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Analytics</TabsTrigger>
             <TabsTrigger value="leaderboard" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Leaderboard</TabsTrigger>
+            <TabsTrigger value="scanner" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
+              <QrCode size={14} className="mr-1" /> Scanner
+            </TabsTrigger>
           </TabsList>
 
           {/* EVENTS TAB */}
@@ -698,7 +702,7 @@ const AdminDashboard = () => {
               <table className="w-full text-sm">
                 <thead className="bg-secondary">
                   <tr>
-                    {["Reg ID", "Name", "Event", "Age", "School", "Status", "Payment", "BIB", "Actions"].map(h => (
+                    {["Reg ID", "Name", "Event", "Age", "School", "Status", "Payment", "BIB", "Check-in", "Actions"].map(h => (
                       <th key={h} className="text-left p-3 text-muted-foreground font-semibold text-xs uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
@@ -714,6 +718,13 @@ const AdminDashboard = () => {
                       <td className="p-3"><Badge className={r.status === "confirmed" ? "bg-green-100 text-green-700" : "bg-secondary text-secondary-foreground"}>{r.status}</Badge></td>
                       <td className="p-3"><Badge className={r.payment_status === "paid" ? "bg-primary/10 text-primary" : "bg-yellow-100 text-yellow-800"}>{r.payment_status}</Badge></td>
                       <td className="p-3 text-foreground font-semibold">{r.bib_number || "—"}</td>
+                      <td className="p-3">
+                        {(r as any).checked_in ? (
+                          <Badge className="bg-green-100 text-green-700 gap-1">✅ {(r as any).checked_in_at ? new Date((r as any).checked_in_at).toLocaleTimeString() : "Yes"}</Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-muted-foreground">No</Badge>
+                        )}
+                      </td>
                       <td className="p-3"><BibAssigner registration={r} onUpdate={fetchAll} /></td>
                     </tr>
                   ))}
@@ -958,6 +969,11 @@ const AdminDashboard = () => {
           {/* LEADERBOARD TAB */}
           <TabsContent value="leaderboard">
             <AdminLeaderboard results={results} events={events} registrations={registrations} />
+          </TabsContent>
+
+          {/* SCANNER TAB */}
+          <TabsContent value="scanner">
+            <AdminQRScanner />
           </TabsContent>
         </Tabs>
       </div>

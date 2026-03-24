@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Calendar, MapPin, Trophy, User, LogOut, Download, Clock, Flame, History, ArrowRight, Camera } from "lucide-react";
+import { Calendar, MapPin, Trophy, User, LogOut, Download, Clock, Flame, History, ArrowRight, Camera, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -269,6 +269,13 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
+                      {(reg as any).registration_number && (
+                        <Link to={`/ticket/${reg.id}`}>
+                          <Button variant="outline" size="sm" className="gap-1 text-xs font-semibold uppercase tracking-wider">
+                            <Ticket size={14} /> View Ticket
+                          </Button>
+                        </Link>
+                      )}
                       {reg.bib_number && (
                         <Badge className="bg-secondary text-secondary-foreground font-semibold">BIB #{reg.bib_number}</Badge>
                       )}
