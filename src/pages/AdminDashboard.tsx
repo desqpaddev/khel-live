@@ -104,17 +104,65 @@ const AdminDashboard = () => {
 
   const fetchAll = async () => {
     setLoading(true);
-    const [evRes, regRes, resRes, usersRes] = await Promise.all([
+    const [evRes, regRes, resRes, usersRes, ticketRes] = await Promise.all([
       supabase.from("events").select("*").order("event_date", { ascending: false }),
       supabase.from("registrations").select("*, events(*)").order("created_at", { ascending: false }),
       supabase.from("results").select("*, events(*), registrations(*)").order("created_at", { ascending: false }),
       supabase.from("profiles").select("*").order("created_at", { ascending: false }),
+      supabase.from("tickets").select("*, events(*)").order("created_at", { ascending: false }),
     ]);
     if (evRes.data) setEvents(evRes.data);
     if (regRes.data) setRegistrations(regRes.data as Registration[]);
     if (resRes.data) setResults(resRes.data as Result[]);
     if (usersRes.data) setAllUsers(usersRes.data);
+    if (ticketRes.data) setTickets(ticketRes.data as unknown as TicketRow[]);
     setLoading(false);
+  };
+
+  const saveTicket = async () => {
+    const payload = {
+      event_id: ticketForm.event_id,
+      ticket_type: ticketForm.ticket_type,
+      description: ticketForm.description || null,
+      price: ticketForm.price,
+      quantity: ticketForm.quantity,
+      sale_start: ticketForm.sale_start || null,
+      sale_end: ticketForm.sale_end || null,
+      attendee_message: ticketForm.attendee_message || null,
+      status: ticketForm.status,
+    };
+    if (editingTicketId) {
+      const { error } = await supabase.from("tickets").update(payload).eq("id", editingTicketId);
+      if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+      toast({ title: "Ticket updated ✅" });
+    } else {
+      const { error } = await supabase.from("tickets").insert(payload);
+      if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+      toast({ title: "Ticket created 🎟️" });
+    }
+    setTicketDialogOpen(false);
+    setEditingTicketId(null);
+    setTicketForm(emptyTicket);
+    fetchAll();
+  };
+
+  const deleteTicket = async (id: string) => {
+    const { error } = await supabase.from("tickets").delete().eq("id", id);
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    toast({ title: "Ticket deleted" });
+    fetchAll();
+  };
+
+  const openEditTicket = (t: TicketRow) => {
+    setEditingTicketId(t.id);
+    setTicketForm({
+      event_id: t.event_id, ticket_type: t.ticket_type, description: t.description || "",
+      price: t.price, quantity: t.quantity,
+      sale_start: t.sale_start ? t.sale_start.slice(0, 16) : "",
+      sale_end: t.sale_end ? t.sale_end.slice(0, 16) : "",
+      attendee_message: t.attendee_message || "", status: t.status,
+    });
+    setTicketDialogOpen(true);
   };
 
   const saveEvent = async () => {
