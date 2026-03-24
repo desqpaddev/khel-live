@@ -16,7 +16,8 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAdmin, signOut, loading } = useAuth();
+  const { user, isAdmin, roles, signOut, loading } = useAuth();
+  const hasAnyRole = roles.some(r => r !== "user");
 
   const handleSignOut = async () => {
     await signOut();
