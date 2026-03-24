@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 type Msg = { role: "user" | "assistant"; content: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`;
+const STORAGE_KEY = "khelium_chat_conv_id";
 
 const ChatbotWidget = () => {
   const [open, setOpen] = useState(false);
@@ -18,7 +19,10 @@ const ChatbotWidget = () => {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(() => {
+    return sessionStorage.getItem(STORAGE_KEY);
+  });
+  const streamingRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
 
@@ -26,7 +30,31 @@ const ChatbotWidget = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Listen for admin/bot replies in realtime
+  // Load existing messages when conversationId is restored from storage
+  useEffect(() => {
+    if (!conversationId) return;
+
+    const loadExistingMessages = async () => {
+      const { data } = await supabase
+        .from("chat_messages")
+        .select("*")
+        .eq("conversation_id", conversationId)
+        .order("created_at", { ascending: true });
+
+      if (data && data.length > 0) {
+        const welcome: Msg = { role: "assistant", content: "Hey there! 👋 I'm your KHELIUM Sports Assistant. Ask me anything about our events, registrations, or how to get started!" };
+        const dbMessages: Msg[] = data.map((m: any) => ({
+          role: m.role as "user" | "assistant",
+          content: m.content,
+        }));
+        setMessages([welcome, ...dbMessages]);
+      }
+    };
+
+    loadExistingMessages();
+  }, [conversationId]);
+
+  // Listen for admin replies in realtime
   useEffect(() => {
     if (!conversationId) return;
 
@@ -42,7 +70,7 @@ const ChatbotWidget = () => {
         },
         (payload) => {
           const newMsg = payload.new as any;
-          // Only show messages from admin (not from user or bot - we handle those locally)
+          // Only show admin messages via realtime (bot & user are handled locally)
           if (newMsg.sender_type === "admin") {
             setMessages((prev) => [...prev, { role: "assistant" as const, content: newMsg.content }]);
           }
@@ -63,7 +91,10 @@ const ChatbotWidget = () => {
       user_email: user?.email || "",
     } as any).select().single();
     const id = data?.id;
-    if (id) setConversationId(id);
+    if (id) {
+      setConversationId(id);
+      sessionStorage.setItem(STORAGE_KEY, id);
+    }
     return id;
   };
 
@@ -73,6 +104,7 @@ const ChatbotWidget = () => {
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setLoading(true);
+    streamingRef.current = true;
 
     const convId = await createConversation();
 
@@ -87,14 +119,18 @@ const ChatbotWidget = () => {
     }
 
     let assistantSoFar = "";
+    let assistantAdded = false;
+
     const upsertAssistant = (chunk: string) => {
       assistantSoFar += chunk;
+      const currentContent = assistantSoFar;
       setMessages((prev) => {
-        const last = prev[prev.length - 1];
-        if (last?.role === "assistant" && prev.length > 1 && loading) {
-          return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: assistantSoFar } : m));
+        if (assistantAdded) {
+          // Update the last assistant message
+          return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: currentContent } : m));
         }
-        return [...prev, { role: "assistant", content: assistantSoFar }];
+        assistantAdded = true;
+        return [...prev, { role: "assistant" as const, content: currentContent }];
       });
     };
 
@@ -160,6 +196,7 @@ const ChatbotWidget = () => {
       ]);
     } finally {
       setLoading(false);
+      streamingRef.current = false;
     }
   };
 
