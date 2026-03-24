@@ -407,6 +407,9 @@ const AdminDashboard = () => {
             <TabsTrigger value="scanner" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
               <QrCode size={14} className="mr-1" /> Scanner
             </TabsTrigger>
+            <TabsTrigger value="chat" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
+              <MessageCircle size={14} className="mr-1" /> Chat
+            </TabsTrigger>
             <TabsTrigger value="settings" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
               <Settings size={14} className="mr-1" /> Settings
             </TabsTrigger>
