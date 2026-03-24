@@ -29,6 +29,9 @@ const Dashboard = () => {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [latestReg, setLatestReg] = useState<Registration | null>(null);
 
   const [editProfile, setEditProfile] = useState({
     full_name: "", phone: "", school: "", city: "", board: "", age_group: "",
