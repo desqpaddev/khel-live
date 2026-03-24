@@ -702,7 +702,7 @@ const AdminDashboard = () => {
               <table className="w-full text-sm">
                 <thead className="bg-secondary">
                   <tr>
-                    {["Reg ID", "Name", "Event", "Age", "School", "Status", "Payment", "BIB", "Actions"].map(h => (
+                    {["Reg ID", "Name", "Event", "Age", "School", "Status", "Payment", "BIB", "Check-in", "Actions"].map(h => (
                       <th key={h} className="text-left p-3 text-muted-foreground font-semibold text-xs uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
