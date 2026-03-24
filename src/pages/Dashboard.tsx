@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Tables } from "@/integrations/supabase/types";
+import { downloadCertificate } from "@/lib/certificate";
 
 type Registration = Tables<"registrations"> & { events?: Tables<"events"> | null };
 type Result = Tables<"results"> & { events?: Tables<"events"> | null };
