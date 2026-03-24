@@ -122,7 +122,7 @@ const HeroVideoSlider = () => {
                 </Button>
               </Link>
               <Link to="/about">
-                <Button size="lg" variant="outline" className="border-white/25 text-white hover:bg-white/10 uppercase tracking-wider font-bold text-base px-8 py-6 gap-2">
+                <Button size="lg" variant="outline" className="border-white/40 text-white bg-white/10 hover:bg-white/20 uppercase tracking-wider font-bold text-base px-8 py-6 gap-2">
                   <Play size={16} /> Watch Highlights
                 </Button>
               </Link>
