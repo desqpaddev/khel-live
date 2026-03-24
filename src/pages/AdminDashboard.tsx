@@ -376,6 +376,101 @@ const AdminDashboard = () => {
             </div>
           </TabsContent>
 
+          {/* TICKETS TAB */}
+          <TabsContent value="tickets">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold font-display text-foreground uppercase">Manage Tickets ({tickets.length})</h2>
+              <Dialog open={ticketDialogOpen} onOpenChange={(o) => { setTicketDialogOpen(o); if (!o) { setEditingTicketId(null); setTicketForm(emptyTicket); } }}>
+                <DialogTrigger asChild>
+                  <Button className="bg-primary text-primary-foreground gap-2 uppercase font-semibold tracking-wider"><Plus size={16} /> Create Ticket</Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="font-display uppercase">{editingTicketId ? "Edit Ticket" : "Create Ticket"}</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-xs font-semibold uppercase tracking-wider">Event</Label>
+                      <Select value={ticketForm.event_id} onValueChange={(v) => setTicketForm({ ...ticketForm, event_id: v })}>
+                        <SelectTrigger><SelectValue placeholder="Select event" /></SelectTrigger>
+                        <SelectContent>{events.map((e) => <SelectItem key={e.id} value={e.id}>{e.title}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-xs font-semibold uppercase tracking-wider">Ticket Type</Label>
+                        <Select value={ticketForm.ticket_type} onValueChange={(v) => setTicketForm({ ...ticketForm, ticket_type: v })}>
+                          <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="General">General</SelectItem>
+                            <SelectItem value="VIP">VIP</SelectItem>
+                            <SelectItem value="Early Bird">Early Bird</SelectItem>
+                            <SelectItem value="Group">Group</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-semibold uppercase tracking-wider">Status</Label>
+                        <Select value={ticketForm.status} onValueChange={(v) => setTicketForm({ ...ticketForm, status: v })}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="paused">Paused</SelectItem>
+                            <SelectItem value="sold_out">Sold Out</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><Label className="text-xs font-semibold uppercase tracking-wider">Price (₹)</Label><Input type="number" value={ticketForm.price} onChange={(e) => setTicketForm({ ...ticketForm, price: parseInt(e.target.value) || 0 })} /></div>
+                      <div><Label className="text-xs font-semibold uppercase tracking-wider">Quantity</Label><Input type="number" value={ticketForm.quantity} onChange={(e) => setTicketForm({ ...ticketForm, quantity: parseInt(e.target.value) || 100 })} /></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><Label className="text-xs font-semibold uppercase tracking-wider">Sale Start</Label><Input type="datetime-local" value={ticketForm.sale_start} onChange={(e) => setTicketForm({ ...ticketForm, sale_start: e.target.value })} /></div>
+                      <div><Label className="text-xs font-semibold uppercase tracking-wider">Sale End</Label><Input type="datetime-local" value={ticketForm.sale_end} onChange={(e) => setTicketForm({ ...ticketForm, sale_end: e.target.value })} /></div>
+                    </div>
+                    <div><Label className="text-xs font-semibold uppercase tracking-wider">Description</Label><Textarea value={ticketForm.description} onChange={(e) => setTicketForm({ ...ticketForm, description: e.target.value })} rows={2} placeholder="Ticket details visible to buyers" /></div>
+                    <div><Label className="text-xs font-semibold uppercase tracking-wider">Message to Attendee</Label><Textarea value={ticketForm.attendee_message} onChange={(e) => setTicketForm({ ...ticketForm, attendee_message: e.target.value })} rows={2} placeholder="Shown after purchase confirmation" /></div>
+                    <Button onClick={saveTicket} className="w-full bg-primary text-primary-foreground uppercase font-bold tracking-wider">{editingTicketId ? "Update Ticket" : "Create Ticket"}</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-card">
+              <table className="w-full text-sm">
+                <thead className="bg-secondary">
+                  <tr>
+                    {["Event", "Type", "Price", "Qty", "Sale Period", "Status", "Actions"].map(h => (
+                      <th key={h} className="text-left p-3 text-muted-foreground font-semibold text-xs uppercase tracking-wider">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {tickets.map((t) => (
+                    <tr key={t.id} className="border-t border-border">
+                      <td className="p-3 text-foreground font-medium">{t.events?.title || "—"}</td>
+                      <td className="p-3"><Badge className="bg-primary/10 text-primary">{t.ticket_type}</Badge></td>
+                      <td className="p-3 text-foreground font-semibold">₹{t.price}</td>
+                      <td className="p-3 text-foreground">{t.quantity}</td>
+                      <td className="p-3 text-muted-foreground text-xs">
+                        {t.sale_start ? new Date(t.sale_start).toLocaleDateString() : "—"} → {t.sale_end ? new Date(t.sale_end).toLocaleDateString() : "—"}
+                      </td>
+                      <td className="p-3"><Badge className={t.status === "active" ? "bg-green-100 text-green-700" : t.status === "sold_out" ? "bg-destructive/10 text-destructive" : "bg-secondary text-secondary-foreground"}>{t.status}</Badge></td>
+                      <td className="p-3">
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="ghost" onClick={() => openEditTicket(t)} className="text-muted-foreground hover:text-foreground"><Edit size={16} /></Button>
+                          <Button size="sm" variant="ghost" onClick={() => deleteTicket(t.id)} className="text-destructive hover:text-destructive"><Trash2 size={16} /></Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {tickets.length === 0 && <p className="text-center text-muted-foreground py-8">No tickets created yet. Create your first ticket!</p>}
+            </div>
+          </TabsContent>
+
           {/* REGISTRATIONS TAB */}
           <TabsContent value="registrations">
             <div className="flex items-center justify-between mb-4">
