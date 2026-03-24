@@ -16,7 +16,8 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAdmin, signOut, loading } = useAuth();
+  const { user, isAdmin, roles, signOut, loading } = useAuth();
+  const hasAnyRole = roles.some(r => r !== "user");
 
   const handleSignOut = async () => {
     await signOut();
@@ -50,7 +51,7 @@ const Navbar = () => {
             <>
               {user ? (
                 <>
-                  {isAdmin && (
+                  {hasAnyRole && (
                     <Link to="/admin">
                       <Button variant="ghost" size="sm" className="text-primary gap-1 font-semibold">
                         <ShieldCheck size={16} /> Admin
@@ -102,7 +103,7 @@ const Navbar = () => {
           {user ? (
             <>
               <Link to="/dashboard" onClick={() => setOpen(false)} className="block py-3 text-sm font-semibold text-foreground">Dashboard</Link>
-              {isAdmin && <Link to="/admin" onClick={() => setOpen(false)} className="block py-3 text-sm font-semibold text-primary">Admin</Link>}
+              {hasAnyRole && <Link to="/admin" onClick={() => setOpen(false)} className="block py-3 text-sm font-semibold text-primary">Admin</Link>}
               <Button variant="ghost" size="sm" onClick={() => { handleSignOut(); setOpen(false); }} className="text-muted-foreground mt-2">Sign Out</Button>
             </>
           ) : (
