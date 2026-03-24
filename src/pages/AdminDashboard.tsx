@@ -187,7 +187,64 @@ const AdminDashboard = () => {
     setTicketDialogOpen(true);
   };
 
-  const saveEvent = async () => {
+  const saveDiscount = async () => {
+    const payload: Record<string, unknown> = {
+      event_id: discountForm.event_id || null,
+      ticket_id: discountForm.ticket_id || null,
+      discount_type: discountForm.discount_type,
+      name: discountForm.name,
+      description: discountForm.description || null,
+      code: discountForm.code || null,
+      discount_value: discountForm.discount_value,
+      discount_unit: discountForm.discount_unit,
+      min_group_size: discountForm.min_group_size ? parseInt(discountForm.min_group_size as string) : null,
+      min_past_events: discountForm.min_past_events ? parseInt(discountForm.min_past_events as string) : null,
+      affiliate_source: discountForm.affiliate_source || null,
+      max_uses: discountForm.max_uses ? parseInt(discountForm.max_uses as string) : null,
+      valid_from: discountForm.valid_from || null,
+      valid_until: discountForm.valid_until || null,
+    };
+    if (editingDiscountId) {
+      const { error } = await supabase.from("discounts").update(payload).eq("id", editingDiscountId);
+      if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+      toast({ title: "Discount updated ✅" });
+    } else {
+      const { error } = await supabase.from("discounts").insert(payload);
+      if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+      toast({ title: "Discount created 🎉" });
+    }
+    setDiscountDialogOpen(false);
+    setEditingDiscountId(null);
+    setDiscountForm(emptyDiscount);
+    fetchAll();
+  };
+
+  const deleteDiscount = async (id: string) => {
+    const { error } = await supabase.from("discounts").delete().eq("id", id);
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    toast({ title: "Discount deleted" });
+    fetchAll();
+  };
+
+  const openEditDiscount = (d: DiscountRow) => {
+    setEditingDiscountId(d.id);
+    setDiscountForm({
+      event_id: d.event_id || "", ticket_id: d.ticket_id || "", discount_type: d.discount_type,
+      name: d.name, description: d.description || "", code: d.code || "",
+      discount_value: d.discount_value, discount_unit: d.discount_unit,
+      min_group_size: d.min_group_size?.toString() || "", min_past_events: d.min_past_events?.toString() || "",
+      affiliate_source: d.affiliate_source || "", max_uses: d.max_uses?.toString() || "",
+      valid_from: d.valid_from ? d.valid_from.slice(0, 16) : "", valid_until: d.valid_until ? d.valid_until.slice(0, 16) : "",
+    });
+    setDiscountDialogOpen(true);
+  };
+
+  const discountTypeLabel = (t: string) => {
+    const map: Record<string, string> = { code: "🏷️ Code", group: "👥 Group", flat: "💰 Flat", loyalty: "⭐ Loyalty", affiliate: "🔗 Affiliate" };
+    return map[t] || t;
+  };
+
+
     const payload = { ...eventForm, created_by: user!.id, age_groups: eventForm.age_groups };
     if (editingEventId) {
       const { error } = await supabase.from("events").update(payload).eq("id", editingEventId);
