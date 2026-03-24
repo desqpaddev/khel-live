@@ -238,6 +238,59 @@ export type Database = {
           },
         ]
       }
+      tickets: {
+        Row: {
+          attendee_message: string | null
+          created_at: string
+          description: string | null
+          event_id: string
+          id: string
+          price: number
+          quantity: number
+          sale_end: string | null
+          sale_start: string | null
+          status: string
+          ticket_type: string
+          updated_at: string
+        }
+        Insert: {
+          attendee_message?: string | null
+          created_at?: string
+          description?: string | null
+          event_id: string
+          id?: string
+          price?: number
+          quantity?: number
+          sale_end?: string | null
+          sale_start?: string | null
+          status?: string
+          ticket_type: string
+          updated_at?: string
+        }
+        Update: {
+          attendee_message?: string | null
+          created_at?: string
+          description?: string | null
+          event_id?: string
+          id?: string
+          price?: number
+          quantity?: number
+          sale_end?: string | null
+          sale_start?: string | null
+          status?: string
+          ticket_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tickets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   Calendar, Users, BarChart3, Trophy, Plus, Edit, Trash2,
-  Search, Download, Medal
+  Search, Download, Medal, Ticket
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,12 +23,33 @@ type Event = Tables<"events">;
 type Registration = Tables<"registrations"> & { events?: Event | null };
 type Result = Tables<"results"> & { registrations?: Tables<"registrations"> | null; events?: Event | null };
 
+type TicketRow = {
+  id: string;
+  event_id: string;
+  ticket_type: string;
+  description: string | null;
+  price: number;
+  quantity: number;
+  sale_start: string | null;
+  sale_end: string | null;
+  attendee_message: string | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  events?: Event | null;
+};
+
 const COLORS = ["hsl(0,85%,50%)", "hsl(28,100%,52%)", "hsl(220,50%,50%)", "hsl(150,50%,45%)", "hsl(45,90%,50%)"];
 
 const emptyEvent = {
   title: "", sport: "", category: "", city: "", venue: "",
   event_date: "", event_time: "", age_groups: [] as string[],
   price: 0, total_spots: 100, description: "", featured: false, status: "upcoming",
+};
+
+const emptyTicket = {
+  event_id: "", ticket_type: "", description: "", price: 0, quantity: 100,
+  sale_start: "", sale_end: "", attendee_message: "", status: "active",
 };
 
 const BibAssigner = ({ registration, onUpdate }: { registration: Registration; onUpdate: () => void }) => {
@@ -64,10 +85,14 @@ const AdminDashboard = () => {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [results, setResults] = useState<Result[]>([]);
   const [allUsers, setAllUsers] = useState<Tables<"profiles">[]>([]);
+  const [tickets, setTickets] = useState<TicketRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [eventForm, setEventForm] = useState(emptyEvent);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
+  const [ticketForm, setTicketForm] = useState(emptyTicket);
+  const [editingTicketId, setEditingTicketId] = useState<string | null>(null);
+  const [ticketDialogOpen, setTicketDialogOpen] = useState(false);
   const [resultDialogOpen, setResultDialogOpen] = useState(false);
   const [resultForm, setResultForm] = useState({
     event_id: "", registration_id: "", position: "", time_recorded: "",
@@ -79,17 +104,65 @@ const AdminDashboard = () => {
 
   const fetchAll = async () => {
     setLoading(true);
-    const [evRes, regRes, resRes, usersRes] = await Promise.all([
+    const [evRes, regRes, resRes, usersRes, ticketRes] = await Promise.all([
       supabase.from("events").select("*").order("event_date", { ascending: false }),
       supabase.from("registrations").select("*, events(*)").order("created_at", { ascending: false }),
       supabase.from("results").select("*, events(*), registrations(*)").order("created_at", { ascending: false }),
       supabase.from("profiles").select("*").order("created_at", { ascending: false }),
+      supabase.from("tickets").select("*, events(*)").order("created_at", { ascending: false }),
     ]);
     if (evRes.data) setEvents(evRes.data);
     if (regRes.data) setRegistrations(regRes.data as Registration[]);
     if (resRes.data) setResults(resRes.data as Result[]);
     if (usersRes.data) setAllUsers(usersRes.data);
+    if (ticketRes.data) setTickets(ticketRes.data as unknown as TicketRow[]);
     setLoading(false);
+  };
+
+  const saveTicket = async () => {
+    const payload = {
+      event_id: ticketForm.event_id,
+      ticket_type: ticketForm.ticket_type,
+      description: ticketForm.description || null,
+      price: ticketForm.price,
+      quantity: ticketForm.quantity,
+      sale_start: ticketForm.sale_start || null,
+      sale_end: ticketForm.sale_end || null,
+      attendee_message: ticketForm.attendee_message || null,
+      status: ticketForm.status,
+    };
+    if (editingTicketId) {
+      const { error } = await supabase.from("tickets").update(payload).eq("id", editingTicketId);
+      if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+      toast({ title: "Ticket updated ✅" });
+    } else {
+      const { error } = await supabase.from("tickets").insert(payload);
+      if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+      toast({ title: "Ticket created 🎟️" });
+    }
+    setTicketDialogOpen(false);
+    setEditingTicketId(null);
+    setTicketForm(emptyTicket);
+    fetchAll();
+  };
+
+  const deleteTicket = async (id: string) => {
+    const { error } = await supabase.from("tickets").delete().eq("id", id);
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    toast({ title: "Ticket deleted" });
+    fetchAll();
+  };
+
+  const openEditTicket = (t: TicketRow) => {
+    setEditingTicketId(t.id);
+    setTicketForm({
+      event_id: t.event_id, ticket_type: t.ticket_type, description: t.description || "",
+      price: t.price, quantity: t.quantity,
+      sale_start: t.sale_start ? t.sale_start.slice(0, 16) : "",
+      sale_end: t.sale_end ? t.sale_end.slice(0, 16) : "",
+      attendee_message: t.attendee_message || "", status: t.status,
+    });
+    setTicketDialogOpen(true);
   };
 
   const saveEvent = async () => {
@@ -215,6 +288,7 @@ const AdminDashboard = () => {
         <Tabs defaultValue="events" className="space-y-6">
           <TabsList className="bg-card border border-border flex-wrap">
             <TabsTrigger value="events" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Events</TabsTrigger>
+            <TabsTrigger value="tickets" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Tickets</TabsTrigger>
             <TabsTrigger value="registrations" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Registrations</TabsTrigger>
             <TabsTrigger value="results" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Results</TabsTrigger>
             <TabsTrigger value="users" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Users</TabsTrigger>
@@ -299,6 +373,101 @@ const AdminDashboard = () => {
                 </div>
               ))}
               {events.length === 0 && <p className="text-center text-muted-foreground py-10">No events yet. Create your first event!</p>}
+            </div>
+          </TabsContent>
+
+          {/* TICKETS TAB */}
+          <TabsContent value="tickets">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold font-display text-foreground uppercase">Manage Tickets ({tickets.length})</h2>
+              <Dialog open={ticketDialogOpen} onOpenChange={(o) => { setTicketDialogOpen(o); if (!o) { setEditingTicketId(null); setTicketForm(emptyTicket); } }}>
+                <DialogTrigger asChild>
+                  <Button className="bg-primary text-primary-foreground gap-2 uppercase font-semibold tracking-wider"><Plus size={16} /> Create Ticket</Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="font-display uppercase">{editingTicketId ? "Edit Ticket" : "Create Ticket"}</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-xs font-semibold uppercase tracking-wider">Event</Label>
+                      <Select value={ticketForm.event_id} onValueChange={(v) => setTicketForm({ ...ticketForm, event_id: v })}>
+                        <SelectTrigger><SelectValue placeholder="Select event" /></SelectTrigger>
+                        <SelectContent>{events.map((e) => <SelectItem key={e.id} value={e.id}>{e.title}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-xs font-semibold uppercase tracking-wider">Ticket Type</Label>
+                        <Select value={ticketForm.ticket_type} onValueChange={(v) => setTicketForm({ ...ticketForm, ticket_type: v })}>
+                          <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="General">General</SelectItem>
+                            <SelectItem value="VIP">VIP</SelectItem>
+                            <SelectItem value="Early Bird">Early Bird</SelectItem>
+                            <SelectItem value="Group">Group</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-semibold uppercase tracking-wider">Status</Label>
+                        <Select value={ticketForm.status} onValueChange={(v) => setTicketForm({ ...ticketForm, status: v })}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="paused">Paused</SelectItem>
+                            <SelectItem value="sold_out">Sold Out</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><Label className="text-xs font-semibold uppercase tracking-wider">Price (₹)</Label><Input type="number" value={ticketForm.price} onChange={(e) => setTicketForm({ ...ticketForm, price: parseInt(e.target.value) || 0 })} /></div>
+                      <div><Label className="text-xs font-semibold uppercase tracking-wider">Quantity</Label><Input type="number" value={ticketForm.quantity} onChange={(e) => setTicketForm({ ...ticketForm, quantity: parseInt(e.target.value) || 100 })} /></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><Label className="text-xs font-semibold uppercase tracking-wider">Sale Start</Label><Input type="datetime-local" value={ticketForm.sale_start} onChange={(e) => setTicketForm({ ...ticketForm, sale_start: e.target.value })} /></div>
+                      <div><Label className="text-xs font-semibold uppercase tracking-wider">Sale End</Label><Input type="datetime-local" value={ticketForm.sale_end} onChange={(e) => setTicketForm({ ...ticketForm, sale_end: e.target.value })} /></div>
+                    </div>
+                    <div><Label className="text-xs font-semibold uppercase tracking-wider">Description</Label><Textarea value={ticketForm.description} onChange={(e) => setTicketForm({ ...ticketForm, description: e.target.value })} rows={2} placeholder="Ticket details visible to buyers" /></div>
+                    <div><Label className="text-xs font-semibold uppercase tracking-wider">Message to Attendee</Label><Textarea value={ticketForm.attendee_message} onChange={(e) => setTicketForm({ ...ticketForm, attendee_message: e.target.value })} rows={2} placeholder="Shown after purchase confirmation" /></div>
+                    <Button onClick={saveTicket} className="w-full bg-primary text-primary-foreground uppercase font-bold tracking-wider">{editingTicketId ? "Update Ticket" : "Create Ticket"}</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-card">
+              <table className="w-full text-sm">
+                <thead className="bg-secondary">
+                  <tr>
+                    {["Event", "Type", "Price", "Qty", "Sale Period", "Status", "Actions"].map(h => (
+                      <th key={h} className="text-left p-3 text-muted-foreground font-semibold text-xs uppercase tracking-wider">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {tickets.map((t) => (
+                    <tr key={t.id} className="border-t border-border">
+                      <td className="p-3 text-foreground font-medium">{t.events?.title || "—"}</td>
+                      <td className="p-3"><Badge className="bg-primary/10 text-primary">{t.ticket_type}</Badge></td>
+                      <td className="p-3 text-foreground font-semibold">₹{t.price}</td>
+                      <td className="p-3 text-foreground">{t.quantity}</td>
+                      <td className="p-3 text-muted-foreground text-xs">
+                        {t.sale_start ? new Date(t.sale_start).toLocaleDateString() : "—"} → {t.sale_end ? new Date(t.sale_end).toLocaleDateString() : "—"}
+                      </td>
+                      <td className="p-3"><Badge className={t.status === "active" ? "bg-green-100 text-green-700" : t.status === "sold_out" ? "bg-destructive/10 text-destructive" : "bg-secondary text-secondary-foreground"}>{t.status}</Badge></td>
+                      <td className="p-3">
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="ghost" onClick={() => openEditTicket(t)} className="text-muted-foreground hover:text-foreground"><Edit size={16} /></Button>
+                          <Button size="sm" variant="ghost" onClick={() => deleteTicket(t.id)} className="text-destructive hover:text-destructive"><Trash2 size={16} /></Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {tickets.length === 0 && <p className="text-center text-muted-foreground py-8">No tickets created yet. Create your first ticket!</p>}
             </div>
           </TabsContent>
 
