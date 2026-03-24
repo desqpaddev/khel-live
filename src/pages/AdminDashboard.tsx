@@ -395,25 +395,36 @@ const AdminDashboard = () => {
           ))}
         </div>
 
-        <Tabs defaultValue="events" className="space-y-6">
+        {/* Tab mapping: resource -> tab values */}
+        {/* events -> events, tickets; registrations -> registrations; results -> results, leaderboard; 
+            scanner -> scanner; chat -> chat; analytics -> analytics; users -> users; settings -> settings; discounts -> discounts */}
+        
+        {(() => {
+          const tabConfig = [
+            { value: "events", label: "Events", resource: "events" },
+            { value: "tickets", label: "Tickets", resource: "events" },
+            { value: "discounts", label: "Discounts", resource: "discounts" },
+            { value: "registrations", label: "Registrations", resource: "registrations" },
+            { value: "results", label: "Results", resource: "results" },
+            { value: "users", label: "Users", resource: "users" },
+            { value: "analytics", label: "Analytics", resource: "analytics" },
+            { value: "leaderboard", label: "Leaderboard", resource: "results" },
+            { value: "scanner", label: "Scanner", resource: "scanner", icon: <QrCode size={14} className="mr-1" /> },
+            { value: "chat", label: "Chat", resource: "chat", icon: <MessageCircle size={14} className="mr-1" /> },
+            { value: "settings", label: "Settings", resource: "settings", icon: <Settings size={14} className="mr-1" /> },
+          ];
+          
+          const visibleTabs = tabConfig.filter(t => isAdmin || hasPermission(t.resource, "read"));
+          const defaultTab = visibleTabs[0]?.value || "events";
+          
+          return (
+        <Tabs defaultValue={defaultTab} className="space-y-6">
           <TabsList className="bg-card border border-border flex-wrap">
-            <TabsTrigger value="events" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Events</TabsTrigger>
-            <TabsTrigger value="tickets" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Tickets</TabsTrigger>
-            <TabsTrigger value="discounts" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Discounts</TabsTrigger>
-            <TabsTrigger value="registrations" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Registrations</TabsTrigger>
-            <TabsTrigger value="results" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Results</TabsTrigger>
-            <TabsTrigger value="users" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Users</TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Analytics</TabsTrigger>
-            <TabsTrigger value="leaderboard" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Leaderboard</TabsTrigger>
-            <TabsTrigger value="scanner" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
-              <QrCode size={14} className="mr-1" /> Scanner
-            </TabsTrigger>
-            <TabsTrigger value="chat" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
-              <MessageCircle size={14} className="mr-1" /> Chat
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
-              <Settings size={14} className="mr-1" /> Settings
-            </TabsTrigger>
+            {visibleTabs.map(t => (
+              <TabsTrigger key={t.value} value={t.value} className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
+                {t.icon}{t.label}
+              </TabsTrigger>
+            ))}
           </TabsList>
 
           {/* EVENTS TAB */}
