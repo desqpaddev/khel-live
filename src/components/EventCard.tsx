@@ -19,8 +19,15 @@ const EventCard = ({ event }: EventCardProps) => {
         transition={{ duration: 0.2 }}
         className="group rounded-lg border border-border bg-card overflow-hidden shadow-card hover:shadow-glow transition-all h-full"
       >
-        {/* Top accent bar */}
-        <div className="h-1 w-full bg-primary" />
+        {/* Event image or accent bar */}
+        {event.image ? (
+          <div className="relative h-40 overflow-hidden">
+            <img src={event.image} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent" />
+          </div>
+        ) : (
+          <div className="h-1 w-full bg-primary" />
+        )}
 
         <div className="p-5">
           <div className="flex items-start justify-between gap-2 mb-3">

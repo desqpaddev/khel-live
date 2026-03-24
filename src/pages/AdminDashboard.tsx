@@ -478,7 +478,7 @@ const AdminDashboard = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    <Button onClick={saveEvent} className="w-full bg-primary text-primary-foreground uppercase font-bold tracking-wider">{editingEventId ? "Update Event" : "Create Event"}</Button>
+                    <Button onClick={saveEvent} disabled={uploadingImage} className="w-full bg-primary text-primary-foreground uppercase font-bold tracking-wider">{uploadingImage ? "Uploading..." : editingEventId ? "Update Event" : "Create Event"}</Button>
                   </div>
                 </DialogContent>
               </Dialog>

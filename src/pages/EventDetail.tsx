@@ -126,8 +126,14 @@ const EventDetail = () => {
   return (
     <div className="min-h-screen bg-background pt-20">
       {/* Hero banner */}
-      <div className="section-dark">
-        <div className="container mx-auto px-4 py-10">
+      <div className="section-dark relative overflow-hidden">
+        {(event as any).image_url && (
+          <div className="absolute inset-0">
+            <img src={(event as any).image_url} alt={event.title} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-r from-khelium-navy/95 via-khelium-navy/80 to-khelium-navy/50" />
+          </div>
+        )}
+        <div className="relative container mx-auto px-4 py-10">
           <Link to="/events" className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-primary mb-4">
             <ArrowLeft size={16} /> Back to Events
           </Link>

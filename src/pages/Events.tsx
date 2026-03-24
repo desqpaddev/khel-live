@@ -61,7 +61,7 @@ const EventsPage = () => {
   const toCardEvent = (e: Event) => ({
     id: e.id, title: e.title, sport: e.sport, category: e.category, city: e.city,
     venue: e.venue, date: e.event_date, time: e.event_time, ageGroups: e.age_groups,
-    price: e.price, spotsLeft: e.total_spots, totalSpots: e.total_spots, image: "",
+    price: e.price, spotsLeft: e.total_spots, totalSpots: e.total_spots, image: (e as any).image_url || "",
     description: e.description || "", featured: e.featured || false,
   });
 
