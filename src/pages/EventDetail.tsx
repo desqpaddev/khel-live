@@ -74,6 +74,44 @@ const EventDetail = () => {
   const spotsPercent = ((event.total_spots - spotsLeft) / event.total_spots) * 100;
   const displayPrice = selectedTicket ? selectedTicket.price : event.price;
 
+  const applyDiscountCode = async () => {
+    if (!discountCode.trim()) return;
+    setApplyingCode(true);
+    setDiscountError("");
+    setAppliedDiscount(null);
+
+    const { data, error } = await supabase
+      .from("discounts")
+      .select("*")
+      .eq("code", discountCode.trim().toUpperCase())
+      .eq("is_active", true)
+      .single();
+
+    if (error || !data) {
+      setDiscountError("Invalid or expired discount code");
+      setApplyingCode(false);
+      return;
+    }
+
+    const d = data as any;
+    const now = new Date();
+    if (d.valid_from && new Date(d.valid_from) > now) { setDiscountError("This code is not active yet"); setApplyingCode(false); return; }
+    if (d.valid_until && new Date(d.valid_until) < now) { setDiscountError("This code has expired"); setApplyingCode(false); return; }
+    if (d.max_uses && d.used_count >= d.max_uses) { setDiscountError("This code has reached its usage limit"); setApplyingCode(false); return; }
+    if (d.event_id && d.event_id !== event.id) { setDiscountError("This code is not valid for this event"); setApplyingCode(false); return; }
+    if (d.ticket_id && selectedTicket && d.ticket_id !== selectedTicket.id) { setDiscountError("This code is not valid for this ticket type"); setApplyingCode(false); return; }
+
+    setAppliedDiscount({ name: d.name, value: d.discount_value, unit: d.discount_unit });
+    setApplyingCode(false);
+  };
+
+  const discountAmount = appliedDiscount
+    ? appliedDiscount.unit === "percent"
+      ? Math.round(displayPrice * appliedDiscount.value / 100)
+      : Math.min(appliedDiscount.value, displayPrice)
+    : 0;
+  const finalPrice = displayPrice - discountAmount;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
