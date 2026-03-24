@@ -327,6 +327,56 @@ const AdminQRScanner = () => {
           )}
         </div>
       </div>
+
+      {/* Checked-in history */}
+      <div className="rounded-lg border border-border bg-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold font-display uppercase text-sm text-foreground">
+            Checked-In Entries ({checkedInList.length})
+          </h3>
+          <div className="flex gap-2">
+            <Button onClick={fetchCheckedInList} variant="outline" size="sm" className="gap-1" disabled={loadingList}>
+              <RefreshCw size={14} className={loadingList ? "animate-spin" : ""} /> Refresh
+            </Button>
+            <Button onClick={downloadExcel} variant="default" size="sm" className="gap-1" disabled={!checkedInList.length}>
+              <Download size={14} /> Download Excel
+            </Button>
+          </div>
+        </div>
+
+        {checkedInList.length === 0 && !loadingList && (
+          <p className="text-muted-foreground text-center py-6 text-sm">No checked-in entries yet.</p>
+        )}
+
+        {checkedInList.length > 0 && (
+          <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 bg-card">
+                <tr className="border-b border-border text-left text-xs uppercase tracking-wider text-muted-foreground">
+                  <th className="py-2 px-2">#</th>
+                  <th className="py-2 px-2">Reg No</th>
+                  <th className="py-2 px-2">Name</th>
+                  <th className="py-2 px-2">Event</th>
+                  <th className="py-2 px-2">BIB</th>
+                  <th className="py-2 px-2">Checked In At</th>
+                </tr>
+              </thead>
+              <tbody>
+                {checkedInList.map((r, i) => (
+                  <tr key={r.registration_number + i} className="border-b border-border/50 hover:bg-muted/30">
+                    <td className="py-2 px-2 text-muted-foreground">{i + 1}</td>
+                    <td className="py-2 px-2 font-mono font-semibold">{r.registration_number}</td>
+                    <td className="py-2 px-2">{r.child_name || `${r.first_name} ${r.last_name}`.trim()}</td>
+                    <td className="py-2 px-2">{r.event_title}</td>
+                    <td className="py-2 px-2">{r.bib_number || "-"}</td>
+                    <td className="py-2 px-2 text-muted-foreground">{r.checked_in_at ? new Date(r.checked_in_at).toLocaleString() : ""}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
