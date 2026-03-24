@@ -131,6 +131,7 @@ export type Database = {
           event_time: string
           featured: boolean | null
           id: string
+          image_url: string | null
           price: number
           sport: string
           status: string
@@ -150,6 +151,7 @@ export type Database = {
           event_time: string
           featured?: boolean | null
           id?: string
+          image_url?: string | null
           price?: number
           sport: string
           status?: string
@@ -169,6 +171,7 @@ export type Database = {
           event_time?: string
           featured?: boolean | null
           id?: string
+          image_url?: string | null
           price?: number
           sport?: string
           status?: string
