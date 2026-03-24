@@ -718,6 +718,13 @@ const AdminDashboard = () => {
                       <td className="p-3"><Badge className={r.status === "confirmed" ? "bg-green-100 text-green-700" : "bg-secondary text-secondary-foreground"}>{r.status}</Badge></td>
                       <td className="p-3"><Badge className={r.payment_status === "paid" ? "bg-primary/10 text-primary" : "bg-yellow-100 text-yellow-800"}>{r.payment_status}</Badge></td>
                       <td className="p-3 text-foreground font-semibold">{r.bib_number || "—"}</td>
+                      <td className="p-3">
+                        {(r as any).checked_in ? (
+                          <Badge className="bg-green-100 text-green-700 gap-1">✅ {(r as any).checked_in_at ? new Date((r as any).checked_in_at).toLocaleTimeString() : "Yes"}</Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-muted-foreground">No</Badge>
+                        )}
+                      </td>
                       <td className="p-3"><BibAssigner registration={r} onUpdate={fetchAll} /></td>
                     </tr>
                   ))}
