@@ -179,6 +179,7 @@ const AdminQRScanner = () => {
     } else {
       toast({ title: "✅ Check-in confirmed!", description: `${scannedAttendee.first_name || scannedAttendee.child_name} is checked in.` });
       setScannedAttendee({ ...scannedAttendee, checked_in: true, checked_in_at: new Date().toISOString() });
+      fetchCheckedInList();
     }
     setProcessing(false);
   };
