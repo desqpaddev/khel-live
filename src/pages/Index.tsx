@@ -124,6 +124,9 @@ const Index = () => {
         </section>
       )}
 
+      {/* Testimonials */}
+      <TestimonialSection />
+
       {/* CTA Section */}
       <section className="relative py-28 overflow-hidden section-dark">
         {/* Animated background accents */}
