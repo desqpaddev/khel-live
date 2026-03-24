@@ -22,6 +22,7 @@ import AdminLeaderboard from "@/components/AdminLeaderboard";
 import AdminQRScanner from "@/components/AdminQRScanner";
 import AdminSettings from "@/components/AdminSettings";
 import AdminChat from "@/components/AdminChat";
+import AdminUserManagement from "@/components/AdminUserManagement";
 
 type Event = Tables<"events">;
 type Registration = Tables<"registrations"> & { events?: Event | null };
