@@ -80,9 +80,37 @@ const RegistrationForm = ({ eventId, userId, ticketLabel, finalPrice, onSuccess 
     if (error) {
       toast({ title: "Registration failed", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Registration Submitted! 🎉", description: `${form.firstName} ${form.lastName} has been registered. Redirecting to your ticket...` });
+      const regNumber = data?.registration_number || "";
+      toast({ title: "Registration Submitted! 🎉", description: `${form.firstName} ${form.lastName} has been registered (${regNumber}). Redirecting to your ticket...` });
       onSuccess();
-      // Navigate to the ticket page
+
+      // Send ticket via email (fire & forget)
+      supabase.functions.invoke("send-ticket-email", {
+        body: {
+          to: form.email,
+          subject: `Your Event Ticket — ${regNumber}`,
+          html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;border:2px solid #e53e3e;border-radius:12px;">
+            <h1 style="color:#e53e3e;text-align:center;">🎫 Your Event Ticket</h1>
+            <p style="text-align:center;font-size:18px;font-weight:bold;">${form.firstName} ${form.lastName}</p>
+            <p style="text-align:center;color:#666;">Registration No: <strong>${regNumber}</strong></p>
+            <hr style="border:1px solid #eee;margin:16px 0;" />
+            <p style="text-align:center;">Please visit your dashboard to download the full ticket with QR code.</p>
+            <p style="text-align:center;color:#999;font-size:12px;">Please bring this ticket to the event for check-in.</p>
+          </div>`,
+        },
+      }).catch(() => {});
+
+      // Send WhatsApp notification (fire & forget)
+      if (form.phone) {
+        supabase.functions.invoke("send-ticket-whatsapp", {
+          body: {
+            phone: form.phone,
+            participantName: `${form.firstName} ${form.lastName}`,
+            registrationNumber: regNumber,
+          },
+        }).catch(() => {});
+      }
+
       setTimeout(() => navigate(`/ticket/${data?.id || regId}`), 1500);
     }
     setSubmitting(false);
