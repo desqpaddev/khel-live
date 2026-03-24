@@ -101,7 +101,7 @@ const BibAssigner = ({ registration, onUpdate }: { registration: Registration; o
 };
 
 const AdminDashboard = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAdmin, hasPermission } = useAuth();
   const { toast } = useToast();
   const [events, setEvents] = useState<Event[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
