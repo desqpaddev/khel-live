@@ -8,6 +8,7 @@ import logo from "@/assets/khelium-logo.png";
 const navLinks = [
   { label: "Home", path: "/" },
   { label: "Events", path: "/events" },
+  { label: "Results", path: "/results" },
   { label: "About", path: "/about" },
 ];
 

@@ -318,7 +318,8 @@ const AdminDashboard = () => {
   const filteredRegs = registrations.filter((r) =>
     !searchReg || r.child_name.toLowerCase().includes(searchReg.toLowerCase()) ||
     r.parent_name.toLowerCase().includes(searchReg.toLowerCase()) ||
-    r.events?.title?.toLowerCase().includes(searchReg.toLowerCase())
+    r.events?.title?.toLowerCase().includes(searchReg.toLowerCase()) ||
+    (r as any).registration_number?.toLowerCase().includes(searchReg.toLowerCase())
   );
 
   const ageGroupOptions = ["U10", "U12", "U14", "U16", "U18"];
@@ -886,12 +887,62 @@ const AdminDashboard = () => {
                 </ResponsiveContainer>
               </div>
 
+              {/* Results Analytics */}
+              <div className="p-5 rounded-lg border border-border bg-card shadow-card">
+                <h3 className="text-sm font-bold font-display text-foreground mb-4 uppercase">Medal Distribution</h3>
+                {(() => {
+                  const medalData = [
+                    { name: "Gold", value: results.filter(r => r.medal === "gold").length },
+                    { name: "Silver", value: results.filter(r => r.medal === "silver").length },
+                    { name: "Bronze", value: results.filter(r => r.medal === "bronze").length },
+                    { name: "No Medal", value: results.filter(r => !r.medal).length },
+                  ].filter(d => d.value > 0);
+                  const medalColors = ["hsl(45,90%,50%)", "hsl(220,10%,70%)", "hsl(25,80%,50%)", "hsl(220,13%,85%)"];
+                  return medalData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={250}>
+                      <PieChart>
+                        <Pie data={medalData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label={({ name, value }) => `${name}: ${value}`}>
+                          {medalData.map((_, i) => <Cell key={i} fill={medalColors[i % medalColors.length]} />)}
+                        </Pie>
+                        <Tooltip contentStyle={{ background: "white", border: "1px solid hsl(220,13%,91%)", borderRadius: 8 }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : <p className="text-center text-muted-foreground py-8">No results data yet</p>;
+                })()}
+              </div>
+
+              <div className="p-5 rounded-lg border border-border bg-card shadow-card">
+                <h3 className="text-sm font-bold font-display text-foreground mb-4 uppercase">Results by Event</h3>
+                {(() => {
+                  const resultsByEvent = Object.entries(
+                    results.reduce<Record<string, number>>((acc, r) => {
+                      const name = r.events?.title || "Unknown";
+                      acc[name] = (acc[name] || 0) + 1;
+                      return acc;
+                    }, {})
+                  ).map(([name, value]) => ({ name: name.length > 20 ? name.slice(0, 20) + "…" : name, value }));
+                  return resultsByEvent.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={250}>
+                      <BarChart data={resultsByEvent}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,13%,91%)" />
+                        <XAxis dataKey="name" tick={{ fill: "hsl(220,10%,46%)", fontSize: 10 }} />
+                        <YAxis tick={{ fill: "hsl(220,10%,46%)", fontSize: 12 }} />
+                        <Tooltip contentStyle={{ background: "white", border: "1px solid hsl(220,13%,91%)", borderRadius: 8 }} />
+                        <Bar dataKey="value" fill="hsl(150,50%,45%)" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : <p className="text-center text-muted-foreground py-8">No results data yet</p>;
+                })()}
+              </div>
+
               <div className="p-5 rounded-lg border border-border bg-card shadow-card">
                 <h3 className="text-sm font-bold font-display text-foreground mb-4 uppercase">Quick Stats</h3>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center"><span className="text-muted-foreground">Total Revenue</span><span className="font-bold text-foreground">₹{revenue.toLocaleString()}</span></div>
                   <div className="flex justify-between items-center"><span className="text-muted-foreground">Avg per Event</span><span className="font-bold text-foreground">{events.length ? Math.round(registrations.length / events.length) : 0} registrations</span></div>
+                  <div className="flex justify-between items-center"><span className="text-muted-foreground">Total Results Published</span><span className="font-bold text-foreground">{results.length}</span></div>
                   <div className="flex justify-between items-center"><span className="text-muted-foreground">Medals Awarded</span><span className="font-bold text-foreground">{results.filter((r) => r.medal).length}</span></div>
+                  <div className="flex justify-between items-center"><span className="text-muted-foreground">Gold Medals</span><span className="font-bold text-foreground">🥇 {results.filter(r => r.medal === "gold").length}</span></div>
                   <div className="flex justify-between items-center"><span className="text-muted-foreground">Paid Registrations</span><span className="font-bold text-foreground">{registrations.filter((r) => r.payment_status === "paid").length}</span></div>
                   <div className="flex justify-between items-center"><span className="text-muted-foreground">Pending Payments</span><span className="font-bold text-primary">{registrations.filter((r) => r.payment_status === "pending").length}</span></div>
                 </div>
