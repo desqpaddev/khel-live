@@ -445,11 +445,29 @@ const AdminDashboard = () => {
                       {r.score !== null && <span>Score: {r.score}</span>}
                     </div>
                   </div>
-                  {r.medal && (
-                    <Badge className={r.medal === "gold" ? "bg-accent text-accent-foreground" : r.medal === "silver" ? "bg-secondary text-secondary-foreground" : "bg-khelium-orange/20 text-primary"}>
-                      {r.medal === "gold" ? "🥇" : r.medal === "silver" ? "🥈" : "🥉"} {r.medal}
-                    </Badge>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {r.medal && (
+                      <Badge className={r.medal === "gold" ? "bg-accent text-accent-foreground" : r.medal === "silver" ? "bg-secondary text-secondary-foreground" : "bg-khelium-orange/20 text-primary"}>
+                        {r.medal === "gold" ? "🥇" : r.medal === "silver" ? "🥈" : "🥉"} {r.medal}
+                      </Badge>
+                    )}
+                    <Button size="sm" variant="ghost" className="text-primary gap-1" onClick={() => downloadCertificate({
+                      childName: r.registrations?.child_name || "Participant",
+                      eventTitle: r.events?.title || "Event",
+                      eventDate: r.events?.event_date || "",
+                      venue: r.events?.venue || "",
+                      city: r.events?.city || "",
+                      position: r.position,
+                      medal: r.medal,
+                      timeRecorded: r.time_recorded,
+                      distanceRecorded: r.distance_recorded,
+                      score: r.score ? Number(r.score) : null,
+                      ageGroup: r.registrations?.age_group,
+                      bibNumber: r.registrations?.bib_number,
+                    })}>
+                      <Download size={14} /> Cert
+                    </Button>
+                  </div>
                 </div>
               ))}
               {results.length === 0 && <p className="text-center text-muted-foreground py-10">No results published yet</p>}
