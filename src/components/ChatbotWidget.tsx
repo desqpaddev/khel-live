@@ -26,6 +26,40 @@ const ChatbotWidget = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Listen for admin/bot replies in realtime
+  useEffect(() => {
+    if (!conversationId) return;
+
+    const channel = supabase
+      .channel(`chat-${conversationId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "chat_messages",
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          const newMsg = payload.new as any;
+          // Only show messages from admin or bot (not from user, we already have those locally)
+          if (newMsg.sender_type === "admin" || (newMsg.sender_type === "bot" && newMsg.role === "assistant")) {
+            // Avoid duplicates - check if we already have this content as the last message
+            setMessages((prev) => {
+              const last = prev[prev.length - 1];
+              if (last?.role === "assistant" && last.content === newMsg.content) return prev;
+              return [...prev, { role: "assistant" as const, content: newMsg.content }];
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [conversationId]);
+
   const createConversation = async () => {
     if (conversationId) return conversationId;
     const { data } = await supabase.from("chat_conversations").insert({
