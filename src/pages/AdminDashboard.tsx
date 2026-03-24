@@ -377,6 +377,9 @@ const AdminDashboard = () => {
             <TabsTrigger value="users" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Users</TabsTrigger>
             <TabsTrigger value="analytics" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Analytics</TabsTrigger>
             <TabsTrigger value="leaderboard" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">Leaderboard</TabsTrigger>
+            <TabsTrigger value="scanner" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase text-xs font-semibold tracking-wider">
+              <QrCode size={14} className="mr-1" /> Scanner
+            </TabsTrigger>
           </TabsList>
 
           {/* EVENTS TAB */}
