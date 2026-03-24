@@ -79,12 +79,55 @@ const RegistrationForm = ({ eventId, userId, ticketLabel, finalPrice, onSuccess 
 
     if (error) {
       toast({ title: "Registration failed", description: error.message, variant: "destructive" });
+      setSubmitting(false);
+      return;
+    }
+
+    const registrationId = data?.id || regId;
+
+    if (finalPrice > 0) {
+      // Initiate Cashfree payment
+      try {
+        toast({ title: "Redirecting to payment...", description: "Please complete the payment to confirm registration." });
+
+        const returnUrl = `${window.location.origin}/payment-status?reg_id=${registrationId}`;
+
+        const { data: orderData, error: orderError } = await supabase.functions.invoke("create-cashfree-order", {
+          body: {
+            registrationId,
+            amount: finalPrice,
+            customerName: `${form.firstName} ${form.lastName}`,
+            customerEmail: form.email,
+            customerPhone: form.phone,
+            returnUrl,
+          },
+        });
+
+        if (orderError || !orderData?.paymentSessionId) {
+          throw new Error(orderError?.message || orderData?.error || "Failed to create payment order");
+        }
+
+        // Load Cashfree SDK and redirect
+        const { load } = await import("@cashfreepayments/cashfree-js");
+        const cashfree = await load({ mode: "production" });
+
+        const checkoutOptions = {
+          paymentSessionId: orderData.paymentSessionId,
+          redirectTarget: "_self",
+        };
+
+        await cashfree.checkout(checkoutOptions);
+      } catch (payErr: any) {
+        console.error("Payment error:", payErr);
+        toast({ title: "Payment initiation failed", description: payErr.message, variant: "destructive" });
+      }
     } else {
+      // Free registration — confirm immediately
       const regNumber = data?.registration_number || "";
-      toast({ title: "Registration Submitted! 🎉", description: `${form.firstName} ${form.lastName} has been registered (${regNumber}). Redirecting to your ticket...` });
+      toast({ title: "Registration Submitted! 🎉", description: `${form.firstName} ${form.lastName} has been registered (${regNumber}).` });
       onSuccess();
 
-      // Send ticket via email (fire & forget)
+      // Send ticket email
       supabase.functions.invoke("send-ticket-email", {
         body: {
           to: form.email,
@@ -95,23 +138,17 @@ const RegistrationForm = ({ eventId, userId, ticketLabel, finalPrice, onSuccess 
             <p style="text-align:center;color:#666;">Registration No: <strong>${regNumber}</strong></p>
             <hr style="border:1px solid #eee;margin:16px 0;" />
             <p style="text-align:center;">Please visit your dashboard to download the full ticket with QR code.</p>
-            <p style="text-align:center;color:#999;font-size:12px;">Please bring this ticket to the event for check-in.</p>
           </div>`,
         },
       }).catch(() => {});
 
-      // Send WhatsApp notification (fire & forget)
       if (form.phone) {
         supabase.functions.invoke("send-ticket-whatsapp", {
-          body: {
-            phone: form.phone,
-            participantName: `${form.firstName} ${form.lastName}`,
-            registrationNumber: regNumber,
-          },
+          body: { phone: form.phone, participantName: `${form.firstName} ${form.lastName}`, registrationNumber: regNumber },
         }).catch(() => {});
       }
 
-      setTimeout(() => navigate(`/ticket/${data?.id || regId}`), 1500);
+      setTimeout(() => navigate(`/ticket/${registrationId}`), 1500);
     }
     setSubmitting(false);
   };
