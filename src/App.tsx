@@ -29,10 +29,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, roles, loading } = useAuth();
   if (loading) return <div className="min-h-screen bg-background pt-24 flex items-center justify-center"><p className="text-muted-foreground">Loading...</p></div>;
   if (!user) return <Navigate to="/auth" replace />;
-  if (!isAdmin) return <Navigate to="/dashboard" replace />;
+  // Allow access if user has any role beyond 'user'
+  const hasAdminRole = roles.some(r => r !== "user");
+  if (!hasAdminRole) return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
 };
 
