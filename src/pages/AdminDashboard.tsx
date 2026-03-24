@@ -408,6 +408,7 @@ const AdminDashboard = () => {
             { value: "registrations", label: "Registrations", resource: "registrations" },
             { value: "results", label: "Results", resource: "results" },
             { value: "users", label: "Users", resource: "users" },
+            { value: "finance", label: "Finance", resource: "finance", icon: <IndianRupee size={14} className="mr-1" /> },
             { value: "analytics", label: "Analytics", resource: "analytics" },
             { value: "leaderboard", label: "Leaderboard", resource: "results" },
             { value: "scanner", label: "Scanner", resource: "scanner", icon: <QrCode size={14} className="mr-1" /> },
