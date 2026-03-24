@@ -103,7 +103,7 @@ const Navbar = () => {
           {user ? (
             <>
               <Link to="/dashboard" onClick={() => setOpen(false)} className="block py-3 text-sm font-semibold text-foreground">Dashboard</Link>
-              {isAdmin && <Link to="/admin" onClick={() => setOpen(false)} className="block py-3 text-sm font-semibold text-primary">Admin</Link>}
+              {hasAnyRole && <Link to="/admin" onClick={() => setOpen(false)} className="block py-3 text-sm font-semibold text-primary">Admin</Link>}
               <Button variant="ghost" size="sm" onClick={() => { handleSignOut(); setOpen(false); }} className="text-muted-foreground mt-2">Sign Out</Button>
             </>
           ) : (
