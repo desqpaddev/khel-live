@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Html5Qrcode } from "html5-qrcode";
-import { QrCode, CheckCircle2, XCircle, Search, Camera, CameraOff } from "lucide-react";
+import { QrCode, CheckCircle2, XCircle, Search, Camera, CameraOff, Download, RefreshCw } from "lucide-react";
+import * as XLSX from "xlsx";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
