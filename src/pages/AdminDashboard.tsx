@@ -20,6 +20,7 @@ import { downloadCertificate } from "@/lib/certificate";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import AdminLeaderboard from "@/components/AdminLeaderboard";
 import AdminQRScanner from "@/components/AdminQRScanner";
+import AdminSettings from "@/components/AdminSettings";
 
 type Event = Tables<"events">;
 type Registration = Tables<"registrations"> & { events?: Event | null };
