@@ -198,11 +198,30 @@ const Dashboard = () => {
                         <div><span className="text-muted-foreground">Score</span><p className="font-bold text-foreground">{result.score}</p></div>
                       )}
                     </div>
-                    {result.certificate_url && (
-                      <a href={result.certificate_url} target="_blank" className="inline-flex items-center gap-2 mt-3 text-sm text-primary hover:underline">
-                        <Award size={14} /> Download Certificate
-                      </a>
-                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mt-3 text-primary gap-2"
+                      onClick={() => {
+                        const reg = registrations.find(r => r.id === result.registration_id);
+                        downloadCertificate({
+                          childName: reg?.child_name || "Participant",
+                          eventTitle: result.events?.title || "Event",
+                          eventDate: result.events?.event_date || "",
+                          venue: result.events?.venue || "",
+                          city: result.events?.city || "",
+                          position: result.position,
+                          medal: result.medal,
+                          timeRecorded: result.time_recorded,
+                          distanceRecorded: result.distance_recorded,
+                          score: result.score ? Number(result.score) : null,
+                          ageGroup: reg?.age_group,
+                          bibNumber: reg?.bib_number,
+                        });
+                      }}
+                    >
+                      <Download size={14} /> Download Certificate
+                    </Button>
                   </div>
                 ))}
               </div>
