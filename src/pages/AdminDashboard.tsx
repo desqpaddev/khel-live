@@ -32,6 +32,32 @@ const emptyEvent = {
   price: 0, total_spots: 100, description: "", featured: false, status: "upcoming",
 };
 
+const BibAssigner = ({ registration, onUpdate }: { registration: Registration; onUpdate: () => void }) => {
+  const [bib, setBib] = useState(registration.bib_number || "");
+  const [saving, setSaving] = useState(false);
+  const { toast } = useToast();
+
+  const assignBib = async () => {
+    if (!bib.trim()) return;
+    setSaving(true);
+    const { error } = await supabase.from("registrations").update({ bib_number: bib.trim() }).eq("id", registration.id);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: `BIB ${bib} assigned ✅` });
+      onUpdate();
+    }
+    setSaving(false);
+  };
+
+  return (
+    <div className="flex items-center gap-1">
+      <Input value={bib} onChange={(e) => setBib(e.target.value)} placeholder="KH-001" className="h-7 w-24 text-xs bg-muted border-border text-foreground" />
+      <Button size="sm" variant="ghost" onClick={assignBib} disabled={saving} className="h-7 px-2 text-xs text-primary">{saving ? "..." : "Set"}</Button>
+    </div>
+  );
+};
+
 const AdminDashboard = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
