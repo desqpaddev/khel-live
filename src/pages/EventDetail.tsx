@@ -29,7 +29,7 @@ const EventDetail = () => {
   const [selectedTicket, setSelectedTicket] = useState<TicketRow | null>(null);
   const [spotsLeft, setSpotsLeft] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  
   const [discountCode, setDiscountCode] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState<{ name: string; value: number; unit: string } | null>(null);
   const [discountError, setDiscountError] = useState("");
