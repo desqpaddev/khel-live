@@ -48,6 +48,7 @@ const emptyEvent = {
   title: "", sport: "", category: "", city: "", venue: "",
   event_date: "", event_time: "", age_groups: [] as string[],
   price: 0, total_spots: 100, description: "", featured: false, status: "upcoming",
+  image_url: "",
 };
 
 const emptyTicket = {
