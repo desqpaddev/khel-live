@@ -482,15 +482,17 @@ const AdminDashboard = () => {
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <Label className="text-xs font-semibold uppercase tracking-wider">Ticket Type</Label>
-                        <Select value={ticketForm.ticket_type} onValueChange={(v) => setTicketForm({ ...ticketForm, ticket_type: v })}>
-                          <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="General">General</SelectItem>
-                            <SelectItem value="VIP">VIP</SelectItem>
-                            <SelectItem value="Early Bird">Early Bird</SelectItem>
-                            <SelectItem value="Group">Group</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <Input
+                          value={ticketForm.ticket_type}
+                          onChange={(e) => setTicketForm({ ...ticketForm, ticket_type: e.target.value })}
+                          placeholder="e.g. 400M River Swim, VIP, Early Bird"
+                          list="ticket-type-suggestions"
+                        />
+                        <datalist id="ticket-type-suggestions">
+                          {Array.from(new Set(tickets.map(t => t.ticket_type))).concat(["General", "VIP", "Early Bird", "Group"]).filter((v, i, a) => a.indexOf(v) === i).map(t => (
+                            <option key={t} value={t} />
+                          ))}
+                        </datalist>
                       </div>
                       <div>
                         <Label className="text-xs font-semibold uppercase tracking-wider">Status</Label>
