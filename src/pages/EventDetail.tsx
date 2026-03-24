@@ -111,38 +111,9 @@ const EventDetail = () => {
     : 0;
   const finalPrice = displayPrice - discountAmount;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) {
-      toast({ title: "Please sign in", description: "You need to sign in to register.", variant: "destructive" });
-      return;
-    }
-    setSubmitting(true);
-
-    const { error } = await supabase.from("registrations").insert({
-      event_id: event.id,
-      user_id: user.id,
-      child_name: formData.childName,
-      parent_name: formData.parentName,
-      email: formData.email,
-      phone: formData.phone,
-      school: formData.school,
-      age_group: formData.ageGroup,
-      board: formData.board,
-    });
-
-    if (error) {
-      toast({ title: "Registration failed", description: error.message, variant: "destructive" });
-    } else {
-      const msg = selectedTicket?.attendee_message
-        ? `${formData.childName} has been registered for ${event.title}. ${selectedTicket.attendee_message}`
-        : `${formData.childName} has been registered for ${event.title}.`;
-      toast({ title: "Registration Submitted! 🎉", description: msg });
-      setFormData({ childName: "", parentName: "", email: "", phone: "", school: "", ageGroup: "", board: "" });
-      const { data: spots } = await supabase.rpc("get_event_spots_left", { event_id: event.id });
-      setSpotsLeft(spots ?? spotsLeft - 1);
-    }
-    setSubmitting(false);
+  const handleRegistrationSuccess = async () => {
+    const { data: spots } = await supabase.rpc("get_event_spots_left", { event_id: event.id });
+    setSpotsLeft(spots ?? spotsLeft - 1);
   };
 
   const now = new Date();
