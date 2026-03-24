@@ -979,6 +979,11 @@ const AdminDashboard = () => {
           <TabsContent value="scanner">
             <AdminQRScanner />
           </TabsContent>
+
+          {/* SETTINGS TAB */}
+          <TabsContent value="settings">
+            <AdminSettings />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
