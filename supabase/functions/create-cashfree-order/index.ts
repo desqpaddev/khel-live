@@ -58,7 +58,7 @@ serve(async (req) => {
           customer_phone: customerPhone,
         },
         order_meta: {
-          return_url: `${returnUrl}?order_id={order_id}`,
+          return_url: `${returnUrl}&order_id={order_id}`,
         },
         order_note: `Registration: ${registrationId}`,
       }),
