@@ -189,8 +189,8 @@ const AdminDashboard = () => {
 
   const saveDiscount = async () => {
     const payload = {
-      event_id: discountForm.event_id || null,
-      ticket_id: discountForm.ticket_id || null,
+      event_id: discountForm.event_id && discountForm.event_id !== "all" ? discountForm.event_id : null,
+      ticket_id: discountForm.ticket_id && discountForm.ticket_id !== "all" ? discountForm.ticket_id : null,
       discount_type: discountForm.discount_type,
       name: discountForm.name,
       description: discountForm.description || null,
