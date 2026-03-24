@@ -58,10 +58,31 @@ const Dashboard = () => {
         board: profileRes.data.board || "", age_group: profileRes.data.age_group || "",
       });
     }
-    if (regRes.data) setRegistrations(regRes.data as Registration[]);
+    if (regRes.data) {
+      setRegistrations(regRes.data as Registration[]);
+      setLatestReg((regRes.data as Registration[])[0] || null);
+    }
     if (resultsRes.data) setResults(resultsRes.data as Result[]);
     if (eventsRes.data) setAllEvents(eventsRes.data);
     setLoading(false);
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    setUploadingAvatar(true);
+    const filePath = `${user.id}/avatar.${file.name.split('.').pop()}`;
+    const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, file, { upsert: true });
+    if (uploadError) {
+      toast({ title: "Upload failed", description: uploadError.message, variant: "destructive" });
+      setUploadingAvatar(false);
+      return;
+    }
+    const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(filePath);
+    await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("user_id", user.id);
+    toast({ title: "Photo updated! 📸" });
+    fetchData();
+    setUploadingAvatar(false);
   };
 
   const today = new Date().toISOString().split("T")[0];
