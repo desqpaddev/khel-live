@@ -43,13 +43,13 @@ const AdminChat = () => {
       .channel("admin-chat")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "chat_messages" }, (payload) => {
         const newMsg = payload.new as Message;
-        if (newMsg.conversation_id === selectedConv) {
-          setMessages((prev) => {
-            if (prev.find((m) => m.id === newMsg.id)) return prev;
-            return [...prev, newMsg];
-          });
+        // Only refresh if it's a message from user side (not admin's own sends)
+        if (newMsg.sender_type !== "admin") {
+          if (newMsg.conversation_id === selectedConv) {
+            loadMessages(selectedConv);
+          }
+          fetchConversations();
         }
-        fetchConversations();
       })
       .subscribe();
 
