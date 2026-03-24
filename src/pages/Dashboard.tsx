@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Calendar, MapPin, Trophy, User, LogOut, Download, Clock, Flame, History, ArrowRight, Camera } from "lucide-react";
+import { Calendar, MapPin, Trophy, User, LogOut, Download, Clock, Flame, History, ArrowRight, Camera, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
