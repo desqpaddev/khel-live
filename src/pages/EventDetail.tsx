@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import RegistrationForm from "@/components/RegistrationForm";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Event = Tables<"events">;
@@ -28,15 +29,13 @@ const EventDetail = () => {
   const [selectedTicket, setSelectedTicket] = useState<TicketRow | null>(null);
   const [spotsLeft, setSpotsLeft] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  
   const [discountCode, setDiscountCode] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState<{ name: string; value: number; unit: string } | null>(null);
   const [discountError, setDiscountError] = useState("");
   const [applyingCode, setApplyingCode] = useState(false);
 
-  const [formData, setFormData] = useState({
-    childName: "", parentName: "", email: "", phone: "", school: "", ageGroup: "", board: "",
-  });
+
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -112,38 +111,9 @@ const EventDetail = () => {
     : 0;
   const finalPrice = displayPrice - discountAmount;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) {
-      toast({ title: "Please sign in", description: "You need to sign in to register.", variant: "destructive" });
-      return;
-    }
-    setSubmitting(true);
-
-    const { error } = await supabase.from("registrations").insert({
-      event_id: event.id,
-      user_id: user.id,
-      child_name: formData.childName,
-      parent_name: formData.parentName,
-      email: formData.email,
-      phone: formData.phone,
-      school: formData.school,
-      age_group: formData.ageGroup,
-      board: formData.board,
-    });
-
-    if (error) {
-      toast({ title: "Registration failed", description: error.message, variant: "destructive" });
-    } else {
-      const msg = selectedTicket?.attendee_message
-        ? `${formData.childName} has been registered for ${event.title}. ${selectedTicket.attendee_message}`
-        : `${formData.childName} has been registered for ${event.title}.`;
-      toast({ title: "Registration Submitted! 🎉", description: msg });
-      setFormData({ childName: "", parentName: "", email: "", phone: "", school: "", ageGroup: "", board: "" });
-      const { data: spots } = await supabase.rpc("get_event_spots_left", { event_id: event.id });
-      setSpotsLeft(spots ?? spotsLeft - 1);
-    }
-    setSubmitting(false);
+  const handleRegistrationSuccess = async () => {
+    const { data: spots } = await supabase.rpc("get_event_spots_left", { event_id: event.id });
+    setSpotsLeft(spots ?? spotsLeft - 1);
   };
 
   const now = new Date();
@@ -298,37 +268,9 @@ const EventDetail = () => {
                   <Link to="/auth"><Button className="bg-primary text-primary-foreground w-full uppercase tracking-wider font-bold">Sign In / Sign Up</Button></Link>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div><Label className="text-xs font-semibold uppercase tracking-wider">Child's Name</Label><Input required value={formData.childName} onChange={(e) => setFormData({ ...formData, childName: e.target.value })} placeholder="Full name" /></div>
-                  <div><Label className="text-xs font-semibold uppercase tracking-wider">Parent's Name</Label><Input required value={formData.parentName} onChange={(e) => setFormData({ ...formData, parentName: e.target.value })} placeholder="Full name" /></div>
-                  <div><Label className="text-xs font-semibold uppercase tracking-wider">Email</Label><Input required type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="parent@email.com" /></div>
-                  <div><Label className="text-xs font-semibold uppercase tracking-wider">Phone</Label><Input required value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="+91 ..." /></div>
-                  <div><Label className="text-xs font-semibold uppercase tracking-wider">School</Label><Input required value={formData.school} onChange={(e) => setFormData({ ...formData, school: e.target.value })} placeholder="School name" /></div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label className="text-xs font-semibold uppercase tracking-wider">Age Group</Label>
-                      <Select value={formData.ageGroup} onValueChange={(v) => setFormData({ ...formData, ageGroup: v })}>
-                        <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                        <SelectContent>
-                          {event.age_groups.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label className="text-xs font-semibold uppercase tracking-wider">Board</Label>
-                      <Select value={formData.board} onValueChange={(v) => setFormData({ ...formData, board: v })}>
-                        <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="CBSE">CBSE</SelectItem>
-                          <SelectItem value="ICSE">ICSE</SelectItem>
-                          <SelectItem value="State">State Board</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
+                <>
                   {/* Discount Code */}
-                  <div className="border border-dashed border-border rounded-lg p-3 space-y-2">
+                  <div className="border border-dashed border-border rounded-lg p-3 space-y-2 mb-4">
                     <Label className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1"><Tag size={12} /> Discount Code</Label>
                     <div className="flex gap-2">
                       <Input
@@ -354,18 +296,21 @@ const EventDetail = () => {
 
                   {/* Price Summary */}
                   {discountAmount > 0 && (
-                    <div className="bg-secondary rounded-lg p-3 space-y-1 text-sm">
+                    <div className="bg-secondary rounded-lg p-3 space-y-1 text-sm mb-4">
                       <div className="flex justify-between text-muted-foreground"><span>Ticket Price</span><span>₹{displayPrice}</span></div>
                       <div className="flex justify-between text-green-600"><span>Discount</span><span>-₹{discountAmount}</span></div>
                       <div className="flex justify-between font-bold text-foreground border-t border-border pt-1"><span>Total</span><span>₹{finalPrice}</span></div>
                     </div>
                   )}
 
-                  <Button type="submit" disabled={submitting} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow uppercase tracking-wider font-bold" size="lg">
-                    {submitting ? "Registering..." : `Register Now — ₹${finalPrice}`}
-                  </Button>
-                  <p className="text-xs text-muted-foreground text-center">Includes RFID bib, medal, certificate & photo</p>
-                </form>
+                  <RegistrationForm
+                    eventId={event.id}
+                    userId={user.id}
+                    ticketLabel={selectedTicket?.ticket_type}
+                    finalPrice={finalPrice}
+                    onSuccess={handleRegistrationSuccess}
+                  />
+                </>
               )}
             </div>
           </motion.div>
