@@ -14,8 +14,12 @@ const Footer = () => (
         <div>
           <h4 className="text-sm font-bold uppercase tracking-wider mb-4">Explore</h4>
           <div className="flex flex-col gap-2">
-            <Link to="/events" className="text-sm text-gray-400 hover:text-primary transition-colors">Browse Events</Link>
-            <Link to="/about" className="text-sm text-gray-400 hover:text-primary transition-colors">About KHELIUM</Link>
+            <Link to="/events" className="text-sm text-gray-400 hover:text-primary transition-colors">
+              Browse Events
+            </Link>
+            <Link to="/about" className="text-sm text-gray-400 hover:text-primary transition-colors">
+              About KHELIUM
+            </Link>
           </div>
         </div>
         <div>
@@ -37,7 +41,7 @@ const Footer = () => (
         </div>
       </div>
       <div className="mt-10 pt-6 border-t border-gray-700 flex flex-col md:flex-row items-center justify-between gap-4">
-        <p className="text-xs text-gray-500">© 2026 KHELIUM by TDK Sports & Santos King Tours. All rights reserved.</p>
+        <p className="text-xs text-gray-500">© 2026 AXIVENCE</p>
         <p className="text-xs text-gray-500 italic">Every Sport, Every Spark 🔥</p>
       </div>
     </div>
