@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Calendar, MapPin, Trophy, User, Settings, LogOut, Award, BarChart3 } from "lucide-react";
+import { Calendar, MapPin, Trophy, User, Settings, LogOut, Award, BarChart3, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Tables } from "@/integrations/supabase/types";
+import { downloadCertificate } from "@/lib/certificate";
 
 type Registration = Tables<"registrations"> & { events?: Tables<"events"> | null };
 type Result = Tables<"results"> & { events?: Tables<"events"> | null };
@@ -197,11 +198,30 @@ const Dashboard = () => {
                         <div><span className="text-muted-foreground">Score</span><p className="font-bold text-foreground">{result.score}</p></div>
                       )}
                     </div>
-                    {result.certificate_url && (
-                      <a href={result.certificate_url} target="_blank" className="inline-flex items-center gap-2 mt-3 text-sm text-primary hover:underline">
-                        <Award size={14} /> Download Certificate
-                      </a>
-                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mt-3 text-primary gap-2"
+                      onClick={() => {
+                        const reg = registrations.find(r => r.id === result.registration_id);
+                        downloadCertificate({
+                          childName: reg?.child_name || "Participant",
+                          eventTitle: result.events?.title || "Event",
+                          eventDate: result.events?.event_date || "",
+                          venue: result.events?.venue || "",
+                          city: result.events?.city || "",
+                          position: result.position,
+                          medal: result.medal,
+                          timeRecorded: result.time_recorded,
+                          distanceRecorded: result.distance_recorded,
+                          score: result.score ? Number(result.score) : null,
+                          ageGroup: reg?.age_group,
+                          bibNumber: reg?.bib_number,
+                        });
+                      }}
+                    >
+                      <Download size={14} /> Download Certificate
+                    </Button>
                   </div>
                 ))}
               </div>

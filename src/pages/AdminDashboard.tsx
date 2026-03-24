@@ -17,6 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Tables } from "@/integrations/supabase/types";
+import { downloadCertificate } from "@/lib/certificate";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 
 type Event = Tables<"events">;
@@ -29,6 +30,32 @@ const emptyEvent = {
   title: "", sport: "", category: "", city: "", venue: "",
   event_date: "", event_time: "", age_groups: [] as string[],
   price: 0, total_spots: 100, description: "", featured: false, status: "upcoming",
+};
+
+const BibAssigner = ({ registration, onUpdate }: { registration: Registration; onUpdate: () => void }) => {
+  const [bib, setBib] = useState(registration.bib_number || "");
+  const [saving, setSaving] = useState(false);
+  const { toast } = useToast();
+
+  const assignBib = async () => {
+    if (!bib.trim()) return;
+    setSaving(true);
+    const { error } = await supabase.from("registrations").update({ bib_number: bib.trim() }).eq("id", registration.id);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: `BIB ${bib} assigned ✅` });
+      onUpdate();
+    }
+    setSaving(false);
+  };
+
+  return (
+    <div className="flex items-center gap-1">
+      <Input value={bib} onChange={(e) => setBib(e.target.value)} placeholder="KH-001" className="h-7 w-24 text-xs bg-muted border-border text-foreground" />
+      <Button size="sm" variant="ghost" onClick={assignBib} disabled={saving} className="h-7 px-2 text-xs text-primary">{saving ? "..." : "Set"}</Button>
+    </div>
+  );
 };
 
 const AdminDashboard = () => {
@@ -322,7 +349,8 @@ const AdminDashboard = () => {
                     <th className="text-left p-3 text-muted-foreground font-medium">School</th>
                     <th className="text-left p-3 text-muted-foreground font-medium">Status</th>
                     <th className="text-left p-3 text-muted-foreground font-medium">Payment</th>
-                    <th className="text-left p-3 text-muted-foreground font-medium">BIB</th>
+                     <th className="text-left p-3 text-muted-foreground font-medium">BIB</th>
+                     <th className="text-left p-3 text-muted-foreground font-medium">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -335,6 +363,9 @@ const AdminDashboard = () => {
                       <td className="p-3"><Badge className={r.status === "confirmed" ? "bg-green-500/10 text-green-400" : "bg-secondary text-secondary-foreground"}>{r.status}</Badge></td>
                       <td className="p-3"><Badge className={r.payment_status === "paid" ? "bg-primary/10 text-primary" : "bg-accent/10 text-accent"}>{r.payment_status}</Badge></td>
                       <td className="p-3 text-foreground">{r.bib_number || "—"}</td>
+                      <td className="p-3">
+                        <BibAssigner registration={r} onUpdate={fetchAll} />
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -414,11 +445,29 @@ const AdminDashboard = () => {
                       {r.score !== null && <span>Score: {r.score}</span>}
                     </div>
                   </div>
-                  {r.medal && (
-                    <Badge className={r.medal === "gold" ? "bg-accent text-accent-foreground" : r.medal === "silver" ? "bg-secondary text-secondary-foreground" : "bg-khelium-orange/20 text-primary"}>
-                      {r.medal === "gold" ? "🥇" : r.medal === "silver" ? "🥈" : "🥉"} {r.medal}
-                    </Badge>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {r.medal && (
+                      <Badge className={r.medal === "gold" ? "bg-accent text-accent-foreground" : r.medal === "silver" ? "bg-secondary text-secondary-foreground" : "bg-khelium-orange/20 text-primary"}>
+                        {r.medal === "gold" ? "🥇" : r.medal === "silver" ? "🥈" : "🥉"} {r.medal}
+                      </Badge>
+                    )}
+                    <Button size="sm" variant="ghost" className="text-primary gap-1" onClick={() => downloadCertificate({
+                      childName: r.registrations?.child_name || "Participant",
+                      eventTitle: r.events?.title || "Event",
+                      eventDate: r.events?.event_date || "",
+                      venue: r.events?.venue || "",
+                      city: r.events?.city || "",
+                      position: r.position,
+                      medal: r.medal,
+                      timeRecorded: r.time_recorded,
+                      distanceRecorded: r.distance_recorded,
+                      score: r.score ? Number(r.score) : null,
+                      ageGroup: r.registrations?.age_group,
+                      bibNumber: r.registrations?.bib_number,
+                    })}>
+                      <Download size={14} /> Cert
+                    </Button>
+                  </div>
                 </div>
               ))}
               {results.length === 0 && <p className="text-center text-muted-foreground py-10">No results published yet</p>}
