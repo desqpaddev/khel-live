@@ -407,7 +407,7 @@ const AdminDashboard = () => {
             { value: "discounts", label: "Discounts", resource: "discounts" },
             { value: "registrations", label: "Registrations", resource: "registrations" },
             { value: "results", label: "Results", resource: "results" },
-            { value: "users", label: "Users", resource: "users" },
+            // { value: "users", label: "Users", resource: "users" }, // Hidden for now
             { value: "finance", label: "Finance", resource: "finance", icon: <IndianRupee size={14} className="mr-1" /> },
             { value: "analytics", label: "Analytics", resource: "analytics" },
             { value: "leaderboard", label: "Leaderboard", resource: "results" },
